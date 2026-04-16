@@ -19,7 +19,7 @@
 ## GitHub Stats
 
 <p align="center">
-  <img src="https://github-readme-stats.vercel.app/api?username=bymedeu&show_icons=true&theme=tokyonight&hide_border=true&bg_color=00000000" height="150"/>
+  <img src="https://github-readme-stats.vercel.app/api?username=bymedeu&show_icons=true&theme=tokyonight&hide_border=true&bg_color=00000000&include_all_commits=true" height="150"/>
   <img src="https://streak-stats.demolab.com?user=bymedeu&theme=tokyonight&hide_border=true&background=00000000" height="150"/>
 </p>
 
