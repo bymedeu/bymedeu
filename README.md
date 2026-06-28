@@ -1,6 +1,3 @@
-
-[![Profile Banner](github_banner.png)](https://github.com/bymedeu "GitHub Profile")
-
 <h1 align="center">Hi, I'm Medèu! </h1>
 
 <img align="right" src="https://visitor-badge.laobi.icu/badge?page_id=bymedeu_visitor_badge_simple&left_color=royalblue&right_color=black" />
