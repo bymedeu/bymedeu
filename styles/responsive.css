@@ -1,0 +1,44 @@
+@media (max-width: 850px) {
+  .nav { grid-template-columns: 1fr auto; }
+  .nav-links { position: absolute; top: 72px; left: 0; right: 0; display: none; padding: 22px var(--pad) 28px; flex-direction: column; align-items: flex-start; gap: 18px; border-bottom: 1px solid var(--line); background: rgba(5,5,5,.98); }
+  .nav-links.open { display: flex; }
+  .nav-cta { display: none; }
+  .menu-toggle { display: block; }
+  .principle-grid,.about-grid { grid-template-columns: 1fr; }
+  .principle-notes { margin-top: 15px; }
+  .section-heading { grid-template-columns: 1fr; gap: 22px; }
+  .about-main,.skills { max-width: 690px; }
+  .footer-inner { grid-template-columns: 1fr 1fr; }
+  .footer-inner > p:first-of-type { display: none; }
+}
+
+@media (max-width: 650px) {
+  .hero { align-items: flex-start; text-align: left; }
+  .hero h1 { font-size: clamp(48px,15vw,72px); letter-spacing: -.06em; }
+  .hero-actions { width: 100%; }
+  .hero-actions .button { flex: 1; }
+  .hero-visual { width: calc(100% + (2 * var(--pad))); margin-left: calc(-1 * var(--pad)); border-radius: 0; }
+  .orbit-two { width: 370px; height: 370px; }
+  .label-one { left: 8%; }.label-two { right: 7%; }
+  .featured-projects,.all-projects { grid-template-columns: 1fr; }
+  .project-card-featured { grid-column: auto; }
+  .project-card-featured .project-visual,.project-visual { height: 230px; }
+  .project-description { min-height: auto; }
+  .project-content { padding: 20px 17px 17px; }
+  .private-label { padding: 0 7px; font-size: 7px; }
+  .contact-card { min-height: 540px; }
+  .contact-links { align-items: flex-start; flex-direction: column; gap: 18px; }
+  .projects-hero h1 { font-size: clamp(50px,15vw,74px); }
+  .filter-header { align-items: flex-start; }
+  .filter-header > div { flex-direction: column; gap: 7px; }
+  .filter-list { flex-wrap: nowrap; overflow-x: auto; margin-inline: calc(-1 * var(--pad)); padding-inline: var(--pad); scrollbar-width: none; }
+  .filter-list::-webkit-scrollbar { display: none; }
+  .filter-chip { flex: none; }
+}
+
+@media (max-width: 420px) {
+  .language-switch { margin-right: 2px; }
+  .hero-actions { flex-direction: column; }
+  .project-title-row { flex-wrap: wrap; }
+  .footer-inner { min-height: 105px; }
+}

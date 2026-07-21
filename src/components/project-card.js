@@ -1,0 +1,62 @@
+import { getProjectDescription, getProjectName } from "../data/projects.js";
+import { projectFilterUrl } from "../router.js";
+import { icons } from "./icons.js";
+
+export function renderProjectCard(project, i18n, options = {}) {
+  const { language, t } = i18n;
+  const name = getProjectName(project, language);
+  const description = getProjectDescription(project, language);
+  const featured = options.featured ? " project-card-featured" : "";
+  const status = project.status === "planned"
+    ? `<span class="status-label">${t("projects.planned")}</span>`
+    : "";
+
+  return `
+    <article class="project-card${featured} reveal" data-project="${project.id}">
+      <div class="project-visual art-${project.art}" aria-hidden="true">
+        ${renderProjectArt(project.art)}
+        <span class="visual-code">${project.id.toUpperCase()}</span>
+      </div>
+      <div class="project-content">
+        <div class="project-topline">
+          <p class="project-type">${t(`projects.${project.type}`)}</p>${status}
+        </div>
+        <div class="project-title-row">
+          <h3>${name}</h3>
+          ${renderVisibility(project, t)}
+        </div>
+        <p class="project-description">${description}</p>
+        <div class="tag-row">
+          ${project.tags.map((tag) => `<a href="${projectFilterUrl(tag)}" data-project-tag="${tag}">${t(`tags.${tag}`)}</a>`).join("")}
+        </div>
+      </div>
+    </article>
+  `;
+}
+
+function renderVisibility(project, t) {
+  if (project.visibility === "public") {
+    return `<a class="project-link" href="${project.url}" target="_blank" rel="noreferrer" aria-label="${t("projects.public")}">${icons.arrowUpRight}</a>`;
+  }
+
+  return `<span class="private-label">${icons.lock}${t("projects.private")}</span>`;
+}
+
+function renderProjectArt(art) {
+  const glyphs = {
+    stars: '<span class="art-glyph star-glyph">✶</span><span class="star-orbit"></span>',
+    aurora: '<span class="art-glyph">Σ</span><span class="art-ring"></span>',
+    route: '<span class="art-glyph">⌘</span><span class="route-line"></span>',
+    terminal: '<span class="terminal-prompt">$ <i>_</i></span>',
+    compiler: '<span class="art-glyph">{ }</span>',
+    pixels: '<span class="pixel-cluster"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>',
+    service: '<span class="art-glyph">↔</span>', network: '<span class="art-glyph">◇</span>',
+    memory: '<span class="art-glyph">0x</span>', build: '<span class="art-glyph">//</span>',
+    math: '<span class="art-glyph">f(x)</span>', graph: '<span class="art-glyph">◌</span>',
+    game: '<span class="art-glyph">× ○</span>', logic: '<span class="art-glyph">⊢</span>',
+    probability: '<span class="art-glyph">P</span>', grid: '<span class="art-glyph">▦</span>',
+    data: '<span class="art-glyph">∿</span>', vision: '<span class="art-glyph">◉</span>',
+    attention: '<span class="art-glyph">∷</span>', language: '<span class="art-glyph">Aa</span>',
+  };
+  return glyphs[art] ?? '<span class="art-glyph">·</span>';
+}
