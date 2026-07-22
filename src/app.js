@@ -3,8 +3,13 @@ import { renderFooter } from "./components/footer.js";
 import { createI18n } from "./i18n/index.js";
 import { renderHomePage, setupHomePage } from "./pages/home.js";
 import { renderProjectsPage, setupProjectsPage } from "./pages/projects.js";
+import { renderProjectDetailPage, setupProjectDetailPage } from "./pages/project-detail.js";
+import { renderResumePage, setupResumePage } from "./pages/resume.js";
+import { setupProjectCards } from "./components/project-card.js";
+import { setupGlint } from "./components/glint.js";
 import { getRoute, startRouter } from "./router.js";
 import { setupRevealAnimations } from "./reveal.js";
+import { siteConfig } from "../site.config.js";
 
 export function createApp(root) {
   const i18n = createI18n();
@@ -13,9 +18,20 @@ export function createApp(root) {
   function render(options = {}) {
     const previousScroll = options.preserveScroll ? window.scrollY : null;
     const route = getRoute();
+    if (route.page !== "project") {
+      document.title = route.page === "projects"
+        ? `${i18n.t("nav.projects")} — ${siteConfig.identity.name}`
+        : route.page === "resume"
+          ? `${i18n.t("nav.resume")} — ${siteConfig.identity.name}`
+          : i18n.t("meta.title");
+    }
     const page = route.page === "projects"
       ? renderProjectsPage(i18n, route)
-      : renderHomePage(i18n);
+      : route.page === "project"
+        ? renderProjectDetailPage(i18n, route)
+        : route.page === "resume"
+          ? renderResumePage(i18n)
+          : renderHomePage(i18n);
 
     root.innerHTML = `
       <div class="site-shell">
@@ -28,13 +44,25 @@ export function createApp(root) {
     setupHeader(root, i18n, () => render({ preserveScroll: true }));
 
     if (route.page === "projects") {
-      setupProjectsPage(root);
+      setupProjectsPage(root, i18n, setupIndexInteractions);
+    } else if (route.page === "project") {
+      setupProjectDetailPage(root);
+    } else if (route.page === "resume") {
+      setupResumePage(root);
     } else {
       setupHomePage(root);
     }
 
+    setupProjectCards(root);
+    setupGlint(root);
     setupRevealAnimations(root);
     restoreScroll(route, previousScroll);
+  }
+
+  function setupIndexInteractions(index) {
+    setupProjectCards(index);
+    setupGlint(index);
+    setupRevealAnimations(index);
   }
 
   return {

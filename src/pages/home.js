@@ -1,12 +1,23 @@
 import { renderProjectCard } from "../components/project-card.js";
-import { featuredProjectIds, projects } from "../data/projects.js";
+import { projects } from "../data/projects.js";
 import { icons } from "../components/icons.js";
+import { siteConfig } from "../../site.config.js";
+import { projectFilterUrl } from "../router.js";
 
-const toolkit = ["Python", "C++", "C", "PyTorch", "Linux", "Git", "Mathematics", "Scientific computing"];
+const toolkit = [
+  { label: "Python", tag: "python" },
+  { label: "C++", tag: "cpp" },
+  { label: "C", tag: "c" },
+  { label: "PyTorch", tag: "ml" },
+  { label: "Linux", tag: "unix" },
+  { label: "Git", tag: "systems" },
+  { label: "Mathematics", tag: "mathematics" },
+  { label: "Scientific computing", tag: "research" },
+];
 
 export function renderHomePage(i18n) {
   const { t } = i18n;
-  const featured = featuredProjectIds.map((id) => projects.find((project) => project.id === id));
+  const featured = siteConfig.home.featuredProjectIds.map((id) => projects.find((project) => project.id === id));
 
   return `
     <section class="hero container section-pad" id="top">
@@ -54,7 +65,7 @@ export function renderHomePage(i18n) {
         </div>
         <div class="skills reveal reveal-delay-2">
           <p class="skills-label">${t("about.toolkit")}</p>
-          <div class="skills-list">${toolkit.map((item) => `<span>${item}</span>`).join("")}</div>
+          <div class="skills-list">${toolkit.map((item) => `<a href="${projectFilterUrl(item.tag)}">${item.label}</a>`).join("")}</div>
         </div>
       </div>
     </section>
@@ -66,8 +77,13 @@ export function renderHomePage(i18n) {
         <h2>${t("contact.title")}<br><span>${t("contact.titleMuted")}</span></h2>
         <p>${t("contact.copy")}</p>
         <div class="contact-links">
-          <a class="button button-light" href="https://www.linkedin.com/in/amadeoheaulme/" target="_blank" rel="noreferrer">${t("contact.linkedin")}${icons.arrowUpRight}</a>
-          <a class="text-link" href="https://github.com/bymedeu" target="_blank" rel="noreferrer">github.com/bymedeu</a>
+          <a class="button button-light" href="${siteConfig.social.linkedin}" target="_blank" rel="noreferrer">${t("contact.linkedin")}${icons.arrowUpRight}</a>
+          <a class="button button-secondary" href="#/resume">${t("contact.resume")}${icons.chevron}</a>
+          <a class="text-link" href="${siteConfig.social.github}" target="_blank" rel="noreferrer">${siteConfig.social.github.replace("https://", "")}</a>
+        </div>
+        <div class="cv-links" aria-label="${t("contact.cv")}">
+          <a href="${siteConfig.cv.fr}" target="_blank">${t("contact.cvFr")} ${icons.arrowUpRight}</a>
+          <a href="${siteConfig.cv.en}" target="_blank">${t("contact.cvEn")} ${icons.arrowUpRight}</a>
         </div>
       </div>
     </section>
@@ -82,10 +98,14 @@ function renderHeroVisual(t) {
       <div class="visual-grid"></div><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
       <div class="core"><span class="core-ring"></span><span class="core-dot"></span></div>
       <div class="signal signal-one"></div><div class="signal signal-two"></div>
-      <div class="visual-label label-one"><span></span>${t("hero.research")}</div>
-      <div class="visual-label label-two"><span></span>${t("hero.systems")}</div>
-      <div class="visual-label label-three"><span></span>${t("hero.intelligence")}</div>
+      ${renderSatelliteLabel("one", t("hero.research"))}
+      ${renderSatelliteLabel("two", t("hero.systems"))}
+      ${renderSatelliteLabel("three", t("hero.intelligence"))}
       <p class="visual-caption">${t("hero.visualLabel")}</p>
     </div>
   `;
+}
+
+function renderSatelliteLabel(orbit, label) {
+  return `<div class="satellite-orbit satellite-${orbit}"><div class="satellite-track"><div class="visual-label"><span></span>${label}</div></div></div>`;
 }

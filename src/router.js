@@ -4,7 +4,19 @@ export function getRoute() {
   const params = new URLSearchParams(query);
 
   if (path === "/projects") {
-    return { page: "projects", tag: params.get("tag") || "all" };
+    return {
+      page: "projects",
+      tag: params.get("tag") || "all",
+      visibility: params.get("visibility") || "all",
+    };
+  }
+
+  if (path.startsWith("/projects/")) {
+    return { page: "project", projectId: decodeURIComponent(path.slice("/projects/".length)) };
+  }
+
+  if (path === "/resume") {
+    return { page: "resume" };
   }
 
   const section = ["work", "about", "contact"].includes(path.slice(1))
@@ -14,9 +26,16 @@ export function getRoute() {
   return { page: "home", section };
 }
 
-export function projectFilterUrl(tag = "all") {
-  const query = tag === "all" ? "" : `?tag=${encodeURIComponent(tag)}`;
-  return `#/projects${query}`;
+export function projectFilterUrl(tag = "all", visibility = "all") {
+  const params = new URLSearchParams();
+  if (tag !== "all") params.set("tag", tag);
+  if (visibility !== "all") params.set("visibility", visibility);
+  const query = params.toString();
+  return `#/projects${query ? `?${query}` : ""}`;
+}
+
+export function projectDetailUrl(id) {
+  return `#/projects/${encodeURIComponent(id)}`;
 }
 
 export function startRouter(onRouteChange) {

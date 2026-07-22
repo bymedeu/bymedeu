@@ -1,8 +1,20 @@
-<h1 align="center">Hi, I'm Amadéo! </h1>
+<h1 align="center">Hi, I'm Amadéo.</h1>
+
+<p align="center">
+  Computer science student working across artificial intelligence, systems engineering, and research-oriented software.
+</p>
+
+<p align="center">
+  <a href="https://bymedeu.github.io/bymedeu/"><strong>Explore my interactive portfolio →</strong></a>
+</p>
+
+<p align="center">
+  Projects, technical case studies, interactive résumé, and contact information are maintained on the portfolio.
+</p>
 
 <img align="right" src="https://visitor-badge.laobi.icu/badge?page_id=bymedeu_visitor_badge_simple&left_color=royalblue&right_color=black" />
 
-<h3 align="center">Languages and Tools</h3>
+<h3 align="center">Languages and tools</h3>
 
 <p align="center">
   <a href="https://skillicons.dev">

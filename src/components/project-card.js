@@ -1,18 +1,19 @@
-import { getProjectDescription, getProjectName } from "../data/projects.js";
-import { projectFilterUrl } from "../router.js";
+import { getLocalized, getProjectName } from "../data/projects.js";
+import { projectDetailUrl, projectFilterUrl } from "../router.js";
 import { icons } from "./icons.js";
 
 export function renderProjectCard(project, i18n, options = {}) {
   const { language, t } = i18n;
   const name = getProjectName(project, language);
-  const description = getProjectDescription(project, language);
+  const description = getLocalized(project.description, language);
   const featured = options.featured ? " project-card-featured" : "";
+  const filterVisibility = options.filterVisibility ?? "all";
   const status = project.status === "planned"
     ? `<span class="status-label">${t("projects.planned")}</span>`
     : "";
 
   return `
-    <article class="project-card${featured} reveal" data-project="${project.id}">
+    <article class="project-card${featured} reveal" data-project="${project.id}" data-project-href="${projectDetailUrl(project.id)}" tabindex="0" role="link" aria-label="${name}">
       <div class="project-visual art-${project.art}" aria-hidden="true">
         ${renderProjectArt(project.art)}
         <span class="visual-code">${project.id.toUpperCase()}</span>
@@ -23,23 +24,30 @@ export function renderProjectCard(project, i18n, options = {}) {
         </div>
         <div class="project-title-row">
           <h3>${name}</h3>
-          ${renderVisibility(project, t)}
+          <span class="card-arrow" aria-hidden="true">${icons.chevron}</span>
         </div>
         <p class="project-description">${description}</p>
         <div class="tag-row">
-          ${project.tags.map((tag) => `<a href="${projectFilterUrl(tag)}" data-project-tag="${tag}">${t(`tags.${tag}`)}</a>`).join("")}
+          ${project.tags.map((tag) => `<a href="${projectFilterUrl(tag, filterVisibility)}" data-project-filter data-project-tag="${tag}">${t(`tags.${tag}`)}</a>`).join("")}
         </div>
       </div>
     </article>
   `;
 }
 
-function renderVisibility(project, t) {
-  if (project.visibility === "public") {
-    return `<a class="project-link" href="${project.url}" target="_blank" rel="noreferrer" aria-label="${t("projects.public")}">${icons.arrowUpRight}</a>`;
-  }
-
-  return `<span class="private-label">${icons.lock}${t("projects.private")}</span>`;
+export function setupProjectCards(root) {
+  root.querySelectorAll("[data-project-href]").forEach((card) => {
+    const open = () => { window.location.hash = card.dataset.projectHref.slice(1); };
+    card.addEventListener("click", (event) => {
+      if (event.target.closest("a, button")) return;
+      open();
+    });
+    card.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      event.preventDefault();
+      open();
+    });
+  });
 }
 
 function renderProjectArt(art) {
@@ -57,6 +65,7 @@ function renderProjectArt(art) {
     probability: '<span class="art-glyph">P</span>', grid: '<span class="art-glyph">▦</span>',
     data: '<span class="art-glyph">∿</span>', vision: '<span class="art-glyph">◉</span>',
     attention: '<span class="art-glyph">∷</span>', language: '<span class="art-glyph">Aa</span>',
+    containers: '<span class="container-stack"><i></i><i></i><i></i></span>',
   };
   return glyphs[art] ?? '<span class="art-glyph">·</span>';
 }

@@ -1,21 +1,24 @@
 import { icons } from "./icons.js";
+import { siteConfig } from "../../site.config.js";
 
 export function renderHeader(i18n, route) {
   const { t, language } = i18n;
-  const isProjects = route.page === "projects";
+  const isProjects = route.page === "projects" || route.page === "project";
+  const isResume = route.page === "resume";
+  const isHome = route.page === "home";
 
-  document.title = t("meta.title");
   document.documentElement.lang = language;
 
   return `
     <header class="nav-wrap" data-nav>
       <nav class="nav container" aria-label="Primary navigation">
-        <a class="brand" href="#/" aria-label="Amadéo, ${t("nav.home")}">
-          <span class="brand-mark" aria-hidden="true"></span><span>Amadéo</span>
+        <a class="brand" href="#/" aria-label="${siteConfig.identity.name}, ${t("nav.home")}">
+          <span class="brand-mark" aria-hidden="true"></span><span>${siteConfig.identity.name}</span>
         </a>
         <div class="nav-links" id="primary-menu">
-          <a href="#/" ${!isProjects && !route.section ? 'aria-current="page"' : ""}>${t("nav.home")}</a>
+          <a href="#/" ${isHome && !route.section ? 'aria-current="page"' : ""}>${t("nav.home")}</a>
           <a href="#/projects" ${isProjects ? 'aria-current="page"' : ""}>${t("nav.projects")}</a>
+          <a href="#/resume" ${isResume ? 'aria-current="page"' : ""}>${t("nav.resume")}</a>
           <a href="#/about">${t("nav.about")}</a>
           <a href="#/contact">${t("nav.contact")}</a>
         </div>
@@ -25,7 +28,7 @@ export function renderHeader(i18n, route) {
             <span>/</span>
             <button type="button" data-language="en" class="${language === "en" ? "active" : ""}" aria-pressed="${language === "en"}">EN</button>
           </div>
-          <a class="nav-cta" href="https://github.com/bymedeu" target="_blank" rel="noreferrer">${t("nav.github")}${icons.arrowUpRight}</a>
+          <a class="nav-cta" href="${siteConfig.social.github}" target="_blank" rel="noreferrer">${t("nav.github")}${icons.arrowUpRight}</a>
           <button class="menu-toggle" type="button" aria-controls="primary-menu" aria-expanded="false">
             <span></span><span></span><span class="sr-only">${t("nav.menu")}</span>
           </button>

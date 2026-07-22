@@ -10,6 +10,13 @@
   .about-main,.skills { max-width: 690px; }
   .footer-inner { grid-template-columns: 1fr 1fr; }
   .footer-inner > p:first-of-type { display: none; }
+  .detail-hero,.detail-grid,.implementation-section,.resource-section,.resume-hero,.resume-section,.resume-interests { grid-template-columns: 1fr; }
+  .github-snapshot-grid,.github-languages { grid-template-columns: 1fr; }
+  .detail-art { order: -1; }
+  .repository-panel { align-items: flex-start; flex-direction: column; }
+  .repository-actions { width: 100%; }
+  .resume-downloads { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .resume-downloads .section-kicker { grid-column: 1/-1; }
 }
 
 @media (max-width: 650px) {
@@ -19,7 +26,9 @@
   .hero-actions .button { flex: 1; }
   .hero-visual { width: calc(100% + (2 * var(--pad))); margin-left: calc(-1 * var(--pad)); border-radius: 0; }
   .orbit-two { width: 370px; height: 370px; }
-  .label-one { left: 8%; }.label-two { right: 7%; }
+  .satellite-one { --orbit-size: 170px; }
+  .satellite-two { --orbit-size: 235px; }
+  .satellite-three { --orbit-size: 300px; }
   .featured-projects,.all-projects { grid-template-columns: 1fr; }
   .project-card-featured { grid-column: auto; }
   .project-card-featured .project-visual,.project-visual { height: 230px; }
@@ -34,6 +43,18 @@
   .filter-list { flex-wrap: nowrap; overflow-x: auto; margin-inline: calc(-1 * var(--pad)); padding-inline: var(--pad); scrollbar-width: none; }
   .filter-list::-webkit-scrollbar { display: none; }
   .filter-chip { flex: none; }
+  .visibility-filter { width: 100%; overflow-x: auto; scrollbar-width: none; }
+  .visibility-filter::-webkit-scrollbar { display: none; }
+  .visibility-option { flex: none; }
+  .detail-heading h1 { font-size: clamp(48px,14vw,72px); }
+  .detail-art { height: 260px; }
+  .repository-actions .button { width: 100%; }
+  .github-metrics { grid-template-columns: 1fr 1fr; }
+  .github-metric { min-height: 125px; padding: 16px; }
+  .language-legend { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .resume-timeline,.resume-more-grid { grid-template-columns: 1fr; }
+  .timeline-entry-featured { grid-column: auto; }
+  .timeline-heading { flex-direction: column; gap: 12px; }
 }
 
 @media (max-width: 420px) {
@@ -41,4 +62,5 @@
   .hero-actions { flex-direction: column; }
   .project-title-row { flex-wrap: wrap; }
   .footer-inner { min-height: 105px; }
+  .resume-downloads,.interest-grid { grid-template-columns: 1fr; }
 }
