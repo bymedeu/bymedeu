@@ -9,18 +9,26 @@
   .section-heading { grid-template-columns: 1fr; gap: 22px; }
   .about-main,.skills { max-width: 690px; }
   .footer-inner { grid-template-columns: 1fr 1fr; }
-  .footer-inner > p:first-of-type { display: none; }
-  .detail-hero,.detail-grid,.implementation-section,.resource-section,.resume-hero,.resume-section,.resume-interests { grid-template-columns: 1fr; }
+  .footer-inner > a:not(.brand) { display: none; }
+  .detail-hero,.detail-grid,.implementation-section,.resource-section,.resume-hero,.chronology-heading,.resume-interests { grid-template-columns: 1fr; }
   .github-snapshot-grid,.github-languages { grid-template-columns: 1fr; }
   .detail-art { order: -1; }
   .repository-panel { align-items: flex-start; flex-direction: column; }
   .repository-actions { width: 100%; }
   .resume-downloads { grid-template-columns: repeat(2,minmax(0,1fr)); }
   .resume-downloads .section-kicker { grid-column: 1/-1; }
+  .home-work .featured-projects { grid-template-columns: 1fr 1fr; }
+  .project-index .all-projects { grid-template-columns: 1fr 1fr; }
 }
 
 @media (max-width: 650px) {
   .hero { align-items: flex-start; text-align: left; }
+  .home-intro h1 { font-size: clamp(48px,14vw,68px); }
+  .home-links { gap: 13px 20px; }
+  .current-row { grid-template-columns: 1fr; gap: 5px; }
+  .current-row time { text-align: left; }
+  .home-work .featured-projects { grid-template-columns: 1fr; }
+  .compact-heading-row { align-items: flex-start; flex-direction: column; }
   .hero h1 { font-size: clamp(48px,15vw,72px); letter-spacing: -.06em; }
   .hero-actions { width: 100%; }
   .hero-actions .button { flex: 1; }
@@ -30,6 +38,7 @@
   .satellite-two { --orbit-size: 235px; }
   .satellite-three { --orbit-size: 300px; }
   .featured-projects,.all-projects { grid-template-columns: 1fr; }
+  .project-index .all-projects { grid-template-columns: 1fr; }
   .project-card-featured { grid-column: auto; }
   .project-card-featured .project-visual,.project-visual { height: 230px; }
   .project-description { min-height: auto; }
@@ -46,15 +55,59 @@
   .visibility-filter { width: 100%; overflow-x: auto; scrollbar-width: none; }
   .visibility-filter::-webkit-scrollbar { display: none; }
   .visibility-option { flex: none; }
+  .timeline-filters {
+    width: 100%;
+    justify-content: stretch;
+    overflow-x: auto;
+  }
+  .timeline-filters button {
+    flex: 1 0 auto;
+    justify-content: center;
+  }
   .detail-heading h1 { font-size: clamp(48px,14vw,72px); }
   .detail-art { height: 260px; }
   .repository-actions .button { width: 100%; }
   .github-metrics { grid-template-columns: 1fr 1fr; }
   .github-metric { min-height: 125px; padding: 16px; }
   .language-legend { grid-template-columns: repeat(2,minmax(0,1fr)); }
-  .resume-timeline,.resume-more-grid { grid-template-columns: 1fr; }
-  .timeline-entry-featured { grid-column: auto; }
-  .timeline-heading { flex-direction: column; gap: 12px; }
+  .timeline-rail {
+    left: 13px;
+    transform: translateX(-50%);
+  }
+  .timeline-event {
+    grid-template-columns: 28px minmax(0,1fr);
+    min-height: 0;
+  }
+  .timeline-event-left .timeline-card,
+  .timeline-event-right .timeline-card {
+    grid-column: 2;
+    --timeline-side-tilt: 0deg;
+  }
+  .timeline-node {
+    top: 29px;
+    left: 13px;
+  }
+  .timeline-event-left .timeline-card::after,
+  .timeline-event-right .timeline-card::after {
+    right: 100%;
+    left: auto;
+    width: 17px;
+    transform: none;
+  }
+  .timeline-card {
+    transform: none !important;
+  }
+  .timeline-card > summary {
+    padding: 20px;
+  }
+  .timeline-expanded {
+    padding: 0 20px 20px;
+  }
+  .timeline-meta {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 7px;
+  }
 }
 
 @media (max-width: 420px) {

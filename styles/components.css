@@ -143,6 +143,8 @@
 
 .glint-target:is(:hover,:focus-visible)::after { opacity: .92; }
 
+.timeline-card-summary.glint-target::before { background: #090909; }
+
 html[data-glint-mode="rgb"] .glint-target::after {
   background:
     radial-gradient(105px circle at calc(var(--glint-x) + 42px) calc(var(--glint-y) - 2px),rgba(72,132,255,.9),transparent 70%),
@@ -188,6 +190,8 @@ html[data-glint-mode="rgb"] .glint-target::after {
 .project-card-featured .project-visual { height: 330px; }
 .project-content { padding: 23px 22px 20px; }
 .project-topline, .project-title-row { display: flex; align-items: center; justify-content: space-between; gap: 15px; }
+.project-card-meta { display: flex; align-items: center; gap: 8px; }
+.project-card-meta time { color: #666; font-family: var(--font-mono); font-size: 8px; letter-spacing: .05em; text-transform: uppercase; }
 .project-title-row { align-items: flex-start; margin-top: 8px; }
 .project-title-row h3 { margin: 0; font-size: 24px; font-weight: 520; line-height: 1.15; letter-spacing: -.035em; }
 .card-arrow { flex: none; width: 28px; height: 28px; display: grid; place-items: center; border: 1px solid #2d2d2d; border-radius: 50%; color: #777; transition: color 160ms ease, border-color 160ms ease, transform 160ms ease; }

@@ -4,6 +4,7 @@ import { translations } from "../src/i18n/translations.js";
 import { siteConfig } from "../site.config.js";
 import { resume } from "../src/data/resume.js";
 import { projectStats } from "../src/data/github-stats.js";
+import { getProjectPeriod, getProjectPeriodIds } from "../src/data/project-dates.js";
 
 const errors = [];
 const ids = new Set();
@@ -42,6 +43,12 @@ for (const project of projects) {
       if (!translations[language].tags[tag]) errors.push(`Missing ${language} translation for tag: ${tag}`);
     }
   }
+
+  if (!getProjectPeriod(project.id)) errors.push(`${project.id} is missing a project date`);
+}
+
+for (const projectId of getProjectPeriodIds()) {
+  if (!ids.has(projectId)) errors.push(`Project date configured for unknown project: ${projectId}`);
 }
 
 for (const [projectId, stats] of Object.entries(projectStats)) {
@@ -58,11 +65,26 @@ for (const projectId of siteConfig.home.featuredProjectIds) {
   if (!ids.has(projectId)) errors.push(`Unknown featured project in site.config.js: ${projectId}`);
 }
 
+const resumeDisplayOrders = new Set();
 for (const section of [resume.experience, resume.education]) {
   for (const entry of section) {
+    if (!/^\d{4}-\d{2}$/.test(entry.sortDate)) {
+      errors.push(`Invalid résumé sort date: ${entry.id}`);
+    }
+    if (!Number.isInteger(entry.displayOrder) || resumeDisplayOrders.has(entry.displayOrder)) {
+      errors.push(`Invalid or duplicate résumé display order: ${entry.id}`);
+    }
+    resumeDisplayOrders.add(entry.displayOrder);
+    if (!Array.isArray(entry.skills) || !entry.skills.length) {
+      errors.push(`Résumé entry has no skills: ${entry.id}`);
+    }
     for (const language of ["en", "fr"]) {
-      if (!entry.period[language] || !entry.title[language] || !entry.description[language]) {
+      if (!entry.period[language] || !entry.title[language]) {
         errors.push(`Incomplete ${language} résumé entry: ${entry.id}`);
+      }
+      const highlights = entry.highlights[language];
+      if (!highlights || highlights.length < 3 || highlights.length > 4) {
+        errors.push(`Résumé entry needs 3–4 ${language} evidence bullets: ${entry.id}`);
       }
     }
     for (const projectId of entry.projectIds) {

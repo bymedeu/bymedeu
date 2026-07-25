@@ -1,8 +1,9 @@
 import { icons } from "../components/icons.js";
-import { getLocalized, getProjectById, getProjectName } from "../data/projects.js";
+import { getLocalized, getProjectById, getProjectName, isProjectLanguageTag } from "../data/projects.js";
 import { projectFilterUrl } from "../router.js";
 import { siteConfig } from "../../site.config.js";
 import { projectStats } from "../data/github-stats.js";
+import { formatProjectPeriod } from "../data/project-dates.js";
 
 const MIN_VISIBLE_SOURCE_LINES = 1000;
 
@@ -18,6 +19,7 @@ export function renderProjectDetailPage(i18n, route) {
   const implementation = getLocalized(project.implementation, language) ?? [];
   const duration = getLocalized(project.duration, language);
   const stats = projectStats[project.id];
+  const period = formatProjectPeriod(project.id, language);
 
   document.title = `${name} — ${siteConfig.identity.name}`;
 
@@ -37,12 +39,16 @@ export function renderProjectDetailPage(i18n, route) {
       </header>
 
       <div class="detail-tag-row reveal">
-        ${project.tags.map((tag) => `<a href="${projectFilterUrl(tag)}">${t(`tags.${tag}`)}</a>`).join("")}
+        ${project.tags.map((tag) => {
+          const href = isProjectLanguageTag(tag) ? projectFilterUrl("all", "all", tag) : projectFilterUrl(tag);
+          return `<a href="${href}">${t(`tags.${tag}`)}</a>`;
+        }).join("")}
         ${project.linkedinUrl ? `<a class="linkedin-project-link" href="${project.linkedinUrl}" target="_blank" rel="noreferrer">${t("detail.linkedinProject")} ${icons.arrowUpRight}</a>` : ""}
       </div>
 
       <section class="detail-grid border-section">
         <div class="detail-facts reveal">
+          ${period ? renderFact(t("detail.date"), period) : ""}
           ${duration ? renderFact(t("detail.duration"), duration) : ""}
           ${project.teamSize ? renderFact(t("detail.team"), t("detail.people")(project.teamSize)) : ""}
           ${stats?.codebaseLines >= MIN_VISIBLE_SOURCE_LINES ? renderFact(t("detail.codebaseSize"), t("detail.lines")(stats.codebaseLines), t("detail.codebaseNote")) : ""}
@@ -96,7 +102,7 @@ function renderRepositorySection(project, name, { t, language }) {
   if (project.repository.access === "public") {
     return `
       <section class="repository-panel reveal">
-        <div><p class="section-kicker">${t("detail.repository")}</p><h2>${t("detail.openSource")}</h2><p>${t("detail.openSourceCopy")}</p></div>
+        <div><p class="section-kicker">${t("detail.repository")}</p><h2>${t("detail.openSource")}</h2></div>
         <a class="button button-light" href="${project.repository.url}" target="_blank" rel="noreferrer">${t("projects.public")}${icons.arrowUpRight}</a>
       </section>
     `;

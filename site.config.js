@@ -21,7 +21,7 @@ export const siteConfig = Object.freeze({
     en: "public/cv/cv-amadeo-en.pdf",
   },
   home: {
-    featuredProjectIds: ["aurora", "word-search-ocr", "42sh"],
+    featuredProjectIds: ["aurora", "ping", "snow-plow"],
   },
   projectResources: {
     // Example for a future OCR report:

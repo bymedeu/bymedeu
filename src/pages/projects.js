@@ -1,5 +1,5 @@
 import { renderProjectCard } from "../components/project-card.js";
-import { getAllTags, projects } from "../data/projects.js";
+import { getTopicTags, projectLanguageTags, projects } from "../data/projects.js";
 import { projectFilterUrl } from "../router.js";
 import { githubSnapshot, projectStats } from "../data/github-stats.js";
 
@@ -8,7 +8,6 @@ export function renderProjectsPage(i18n, route) {
     <section class="projects-hero container">
       <p class="eyebrow reveal">${i18n.t("projects.eyebrow")}</p>
       <h1 class="reveal reveal-delay-1">${i18n.t("projects.title")}</h1>
-      <p class="projects-intro reveal reveal-delay-2">${i18n.t("projects.copy")}</p>
     </section>
     ${renderGithubSnapshot(i18n)}
     ${renderProjectIndex(i18n, route)}
@@ -17,14 +16,16 @@ export function renderProjectsPage(i18n, route) {
 
 export function renderProjectIndex(i18n, route) {
   const { t } = i18n;
-  const tags = getAllTags();
+  const tags = getTopicTags();
   const activeTag = tags.includes(route.tag) ? route.tag : "all";
+  const activeLanguage = projectLanguageTags.includes(route.language) ? route.language : "all";
   const activeVisibility = ["public", "private"].includes(route.visibility) ? route.visibility : "all";
   const matchesTag = (project) => activeTag === "all" || project.tags.includes(activeTag);
+  const matchesLanguage = (project) => activeLanguage === "all" || project.tags.includes(activeLanguage);
   const matchesVisibility = (project) => activeVisibility === "all"
     || (activeVisibility === "public" ? project.repository.access === "public" : project.repository.access !== "public");
-  const visibleProjects = projects.filter((project) => matchesTag(project) && matchesVisibility(project));
-  const filtersAreClear = activeTag === "all" && activeVisibility === "all";
+  const visibleProjects = projects.filter((project) => matchesTag(project) && matchesLanguage(project) && matchesVisibility(project));
+  const filtersAreClear = activeTag === "all" && activeLanguage === "all" && activeVisibility === "all";
   const totalSourceLines = visibleProjects.reduce((total, project) => total + (projectStats[project.id]?.codebaseLines ?? 0), 0);
 
   return `
@@ -37,35 +38,53 @@ export function renderProjectIndex(i18n, route) {
         <a data-project-filter class="clear-filter ${filtersAreClear ? "disabled" : ""}" href="${projectFilterUrl()}">× ${t("projects.clearFilters")}</a>
       </div>
       <div class="visibility-filter reveal" role="group" aria-label="${t("projects.visibility")}">
-        ${renderVisibilityFilter("all", t("projects.allRepositories"), projects, activeTag, activeVisibility)}
-        ${renderVisibilityFilter("public", t("projects.publicRepositories"), projects, activeTag, activeVisibility)}
-        ${renderVisibilityFilter("private", t("projects.privateRepositories"), projects, activeTag, activeVisibility)}
+        ${renderVisibilityFilter("all", t("projects.allRepositories"), projects, activeTag, activeLanguage, activeVisibility)}
+        ${renderVisibilityFilter("public", t("projects.publicRepositories"), projects, activeTag, activeLanguage, activeVisibility)}
+        ${renderVisibilityFilter("private", t("projects.privateRepositories"), projects, activeTag, activeLanguage, activeVisibility)}
       </div>
-      <div class="filter-list reveal" role="list" aria-label="${t("projects.filter")}">
-        <a data-project-filter href="${projectFilterUrl("all", activeVisibility)}" class="filter-chip ${activeTag === "all" ? "active" : ""}" aria-current="${activeTag === "all"}">${t("projects.all")}<span>${projects.filter(matchesVisibility).length}</span></a>
-        ${tags.map((tag) => {
-          const count = projects.filter((project) => project.tags.includes(tag) && matchesVisibility(project)).length;
-          return `<a data-project-filter href="${projectFilterUrl(tag, activeVisibility)}" class="filter-chip ${activeTag === tag ? "active" : ""}" aria-current="${activeTag === tag}">${t(`tags.${tag}`)}<span>${count}</span></a>`;
-        }).join("")}
+      <div class="project-filter-group reveal">
+        <p>${t("projects.programmingLanguage")}</p>
+        <div class="filter-list" role="list" aria-label="${t("projects.programmingLanguage")}">
+          <a data-project-filter href="${projectFilterUrl(activeTag, activeVisibility)}" class="filter-chip ${activeLanguage === "all" ? "active" : ""}" aria-current="${activeLanguage === "all"}">${t("projects.allLanguages")}<span>${projects.filter((project) => matchesTag(project) && matchesVisibility(project)).length}</span></a>
+          ${projectLanguageTags.map((language) => {
+            const count = projects.filter((project) => project.tags.includes(language) && matchesTag(project) && matchesVisibility(project)).length;
+            return `<a data-project-filter href="${projectFilterUrl(activeTag, activeVisibility, language)}" class="filter-chip ${activeLanguage === language ? "active" : ""}" aria-current="${activeLanguage === language}">${t(`tags.${language}`)}<span>${count}</span></a>`;
+          }).join("")}
+        </div>
+      </div>
+      <div class="project-filter-group reveal">
+        <p>${t("projects.topics")}</p>
+        <div class="filter-list" role="list" aria-label="${t("projects.topics")}">
+          <a data-project-filter href="${projectFilterUrl("all", activeVisibility, activeLanguage)}" class="filter-chip ${activeTag === "all" ? "active" : ""}" aria-current="${activeTag === "all"}">${t("projects.allTopics")}<span>${projects.filter((project) => matchesLanguage(project) && matchesVisibility(project)).length}</span></a>
+          ${tags.map((tag) => {
+            const count = projects.filter((project) => project.tags.includes(tag) && matchesLanguage(project) && matchesVisibility(project)).length;
+            return `<a data-project-filter href="${projectFilterUrl(tag, activeVisibility, activeLanguage)}" class="filter-chip ${activeTag === tag ? "active" : ""}" aria-current="${activeTag === tag}">${t(`tags.${tag}`)}<span>${count}</span></a>`;
+          }).join("")}
+        </div>
       </div>
       <div class="all-projects">
         ${visibleProjects.length
-          ? visibleProjects.map((project) => renderProjectCard(project, i18n, { filterVisibility: activeVisibility })).join("")
+          ? visibleProjects.map((project) => renderProjectCard(project, i18n, {
+            filterVisibility: activeVisibility,
+            filterTag: activeTag,
+            filterLanguage: activeLanguage,
+          })).join("")
           : `<p class="empty-state">${t("projects.empty")}</p>`}
       </div>
     </section>
   `;
 }
 
-function renderVisibilityFilter(visibility, label, allProjects, activeTag, activeVisibility) {
+function renderVisibilityFilter(visibility, label, allProjects, activeTag, activeLanguage, activeVisibility) {
   const count = allProjects.filter((project) => {
     const tagMatches = activeTag === "all" || project.tags.includes(activeTag);
+    const languageMatches = activeLanguage === "all" || project.tags.includes(activeLanguage);
     const visibilityMatches = visibility === "all"
       || (visibility === "public" ? project.repository.access === "public" : project.repository.access !== "public");
-    return tagMatches && visibilityMatches;
+    return tagMatches && languageMatches && visibilityMatches;
   }).length;
 
-  return `<a data-project-filter href="${projectFilterUrl(activeTag, visibility)}" class="visibility-option ${activeVisibility === visibility ? "active" : ""}" aria-current="${activeVisibility === visibility}">${label}<span>${count}</span></a>`;
+  return `<a data-project-filter href="${projectFilterUrl(activeTag, visibility, activeLanguage)}" class="visibility-option ${activeVisibility === visibility ? "active" : ""}" aria-current="${activeVisibility === visibility}">${label}<span>${count}</span></a>`;
 }
 
 export function setupProjectsPage(root, i18n, setupIndexInteractions = () => {}) {
@@ -104,6 +123,7 @@ function parseProjectFilterHref(href) {
   return {
     page: "projects",
     tag: params.get("tag") || "all",
+    language: params.get("language") || "all",
     visibility: params.get("visibility") || "all",
   };
 }
@@ -117,8 +137,6 @@ function renderGithubSnapshot({ language, t }) {
         <div class="github-snapshot-intro reveal">
           <p class="section-kicker">${t("projects.githubKicker")}</p>
           <h2>${t("projects.githubTitle")}</h2>
-          <p>${t("projects.githubCopy")}</p>
-          <span>${t("projects.updatedDaily")}</span>
         </div>
         <div class="github-metrics reveal reveal-delay-1">
           ${renderMetric("commits", githubSnapshot.commits, t("projects.commits"), format)}

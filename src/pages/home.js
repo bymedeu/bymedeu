@@ -1,89 +1,85 @@
 import { renderProjectCard } from "../components/project-card.js";
-import { projects } from "../data/projects.js";
+import { isProjectLanguageTag, projects } from "../data/projects.js";
+import { getLocalized } from "../data/projects.js";
+import { resume } from "../data/resume.js";
 import { icons } from "../components/icons.js";
 import { siteConfig } from "../../site.config.js";
 import { projectFilterUrl } from "../router.js";
 
 const toolkit = [
-  { label: "Python", tag: "python" },
-  { label: "C++", tag: "cpp" },
-  { label: "C", tag: "c" },
-  { label: "PyTorch", tag: "ml" },
-  { label: "Linux", tag: "unix" },
-  { label: "Git", tag: "systems" },
-  { label: "Mathematics", tag: "mathematics" },
-  { label: "Scientific computing", tag: "research" },
+  { label: { en: "Python", fr: "Python" }, tag: "python" },
+  { label: { en: "C++", fr: "C++" }, tag: "cpp" },
+  { label: { en: "C", fr: "C" }, tag: "c" },
+  { label: { en: "Java", fr: "Java" }, tag: "java" },
+  { label: { en: "Mathematics", fr: "Mathématiques" }, tag: "mathematics" },
+  { label: { en: "Machine learning", fr: "Machine learning" }, tag: "ml" },
+  { label: { en: "Linux", fr: "Linux" }, tag: "unix" },
+  { label: { en: "Docker", fr: "Docker" }, tag: "docker" },
 ];
 
 export function renderHomePage(i18n) {
-  const { t } = i18n;
-  const featured = siteConfig.home.featuredProjectIds.map((id) => projects.find((project) => project.id === id));
+  const { language, t } = i18n;
+  const featured = siteConfig.home.featuredProjectIds
+    .map((id) => projects.find((project) => project.id === id))
+    .filter(Boolean);
+  const currentEntries = [
+    resume.education.find((entry) => entry.id === "epita"),
+    resume.experience.find((entry) => entry.id === "teaching-assistant"),
+    resume.experience.find((entry) => entry.id === "esa"),
+  ].filter(Boolean);
 
   return `
-    <section class="hero container section-pad" id="top">
-      <div class="hero-glow" aria-hidden="true"></div>
-      <div class="eyebrow reveal"><span class="status-dot"></span>${t("hero.eyebrow")}</div>
-      <h1 class="reveal reveal-delay-1">${t("hero.title")}<br><span>${t("hero.titleMuted")}</span></h1>
-      <p class="hero-copy reveal reveal-delay-2">${t("hero.copy")}</p>
-      <div class="hero-actions reveal reveal-delay-3">
-        <a class="button button-primary" href="#/projects">${t("hero.primary")}${icons.chevron}</a>
-        <a class="button button-secondary" href="#/contact">${t("hero.secondary")}</a>
-      </div>
-      ${renderHeroVisual(t)}
+    <section class="home-intro container">
+      <p class="eyebrow reveal">${siteConfig.identity.name} Héaulme</p>
+      <h1 class="reveal reveal-delay-1">${t("home.title")}</h1>
+      <p class="home-role reveal reveal-delay-1">${t("home.role")}</p>
+      <p class="home-objective reveal reveal-delay-2">${t("home.objective")}</p>
+      <nav class="home-links reveal reveal-delay-2" aria-label="${t("home.links")}">
+        <a href="#/projects">${t("nav.projects")}${icons.chevron}</a>
+        <a href="#/resume">${t("nav.resume")}${icons.chevron}</a>
+        <a href="${siteConfig.social.github}" target="_blank" rel="noreferrer">GitHub${icons.arrowUpRight}</a>
+        <a href="${siteConfig.social.linkedin}" target="_blank" rel="noreferrer">LinkedIn${icons.arrowUpRight}</a>
+        <a href="mailto:${siteConfig.contact.recruiterAccessEmail}">${t("home.email")}${icons.arrowUpRight}</a>
+        <a href="${siteConfig.cv.en}" target="_blank" rel="noreferrer">${t("contact.cvEn")}${icons.arrowUpRight}</a>
+        <a href="${siteConfig.cv.fr}" target="_blank" rel="noreferrer">${t("contact.cvFr")}${icons.arrowUpRight}</a>
+      </nav>
     </section>
 
-    <section class="principles border-section">
-      <div class="container principle-grid">
-        <p class="section-kicker reveal">${t("approach.kicker")}</p>
-        <blockquote class="reveal reveal-delay-1">“${t("approach.quote")}”</blockquote>
-        <div class="principle-notes reveal reveal-delay-2">
-          ${t("approach.notes").map((note) => `<p>${note}</p>`).join("")}
+    <section class="home-current border-section">
+      <div class="container compact-section">
+        <h2 class="compact-heading reveal">${t("home.current")}</h2>
+        <div class="current-list">
+          ${currentEntries.map((entry) => `
+            <a class="current-row reveal" href="#/resume">
+              <span>${entry.organization}</span>
+              <strong>${getLocalized(entry.title, language)}</strong>
+              <time>${getLocalized(entry.period, language)}</time>
+            </a>
+          `).join("")}
         </div>
       </div>
     </section>
 
-    <section class="work container section-pad" id="work">
-      <div class="section-heading reveal">
-        <div><p class="section-kicker">${t("work.kicker")}</p><h2>${t("work.title")}</h2></div>
-        <div class="section-heading-copy">
-          <p>${t("work.copy")}</p>
-          <a class="text-arrow-link" href="#/projects">${t("work.all")}${icons.chevron}</a>
-        </div>
+    <section class="home-work container compact-section">
+      <div class="compact-heading-row reveal">
+        <h2 class="compact-heading">${t("home.selectedProjects")}</h2>
+        <a class="text-arrow-link" href="#/projects">${t("home.allProjects")}${icons.chevron}</a>
       </div>
       <div class="featured-projects">
-        ${featured.map((project, index) => renderProjectCard(project, i18n, { featured: index === 0 })).join("")}
+        ${featured.map((project) => renderProjectCard(project, i18n)).join("")}
       </div>
     </section>
 
-    <section class="about border-section" id="about">
-      <div class="container about-grid section-pad">
-        <p class="section-kicker reveal">${t("about.kicker")}</p>
-        <div class="about-main">
-          <h2 class="reveal">${t("about.title")}</h2>
-          <p class="about-lead reveal reveal-delay-1">${t("about.lead")}</p>
-          <p class="about-body reveal reveal-delay-2">${t("about.body")}</p>
-        </div>
-        <div class="skills reveal reveal-delay-2">
-          <p class="skills-label">${t("about.toolkit")}</p>
-          <div class="skills-list">${toolkit.map((item) => `<a href="${projectFilterUrl(item.tag)}">${item.label}</a>`).join("")}</div>
-        </div>
-      </div>
-    </section>
-
-    <section class="contact container section-pad" id="contact">
-      <div class="contact-card reveal">
-        <div class="contact-glow" aria-hidden="true"></div>
-        <p class="section-kicker">${t("contact.kicker")}</p>
-        <h2>${t("contact.title")}<br><span>${t("contact.titleMuted")}</span></h2>
-        <p>${t("contact.copy")}</p>
-        <div class="contact-links">
-          <a class="button button-light" href="${siteConfig.social.linkedin}" target="_blank" rel="noreferrer">${t("contact.linkedin")}${icons.arrowUpRight}</a>
-          <a class="button button-secondary" href="#/resume">${t("contact.resume")}${icons.chevron}</a>
-          <a class="text-link" href="${siteConfig.social.github}" target="_blank" rel="noreferrer">${siteConfig.social.github.replace("https://", "")}</a>
-        </div>
-        <div class="cv-links" aria-label="${t("contact.cv")}">
-          <a href="${siteConfig.cv.fr}" target="_blank">${t("contact.cvFr")} ${icons.arrowUpRight}</a>
-          <a href="${siteConfig.cv.en}" target="_blank">${t("contact.cvEn")} ${icons.arrowUpRight}</a>
+    <section class="home-toolkit border-section">
+      <div class="container compact-section">
+        <h2 class="compact-heading reveal">${t("home.toolkit")}</h2>
+        <div class="skills-list reveal">
+          ${toolkit.map((item) => {
+            const href = isProjectLanguageTag(item.tag)
+              ? projectFilterUrl("all", "all", item.tag)
+              : projectFilterUrl(item.tag);
+            return `<a href="${href}">${getLocalized(item.label, language)}</a>`;
+          }).join("")}
         </div>
       </div>
     </section>
@@ -91,21 +87,3 @@ export function renderHomePage(i18n) {
 }
 
 export function setupHomePage() {}
-
-function renderHeroVisual(t) {
-  return `
-    <div class="hero-visual reveal reveal-delay-3" aria-hidden="true">
-      <div class="visual-grid"></div><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
-      <div class="core"><span class="core-ring"></span><span class="core-dot"></span></div>
-      <div class="signal signal-one"></div><div class="signal signal-two"></div>
-      ${renderSatelliteLabel("one", t("hero.research"))}
-      ${renderSatelliteLabel("two", t("hero.systems"))}
-      ${renderSatelliteLabel("three", t("hero.intelligence"))}
-      <p class="visual-caption">${t("hero.visualLabel")}</p>
-    </div>
-  `;
-}
-
-function renderSatelliteLabel(orbit, label) {
-  return `<div class="satellite-orbit satellite-${orbit}"><div class="satellite-track"><div class="visual-label"><span></span>${label}</div></div></div>`;
-}

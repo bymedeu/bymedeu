@@ -25,18 +25,18 @@ export const projects = [
     type: "personal", status: "planned", duration: null, teamSize: 1,
     repository: { access: "private", url: githubRepositoryUrl("mystarceiling") },
     linkedinUrl: null,
-    tags: ["research", "mathematics", "web"], art: "stars",
+    tags: ["cpp", "research", "mathematics", "web"], art: "stars",
   },
   {
     id: "aurora",
     name: "Aurora",
     description: {
-      en: "A long-term machine-learning framework and research notebook, progressing from numerical foundations to autograd, attention, and transformers.",
-      fr: "Un framework d’apprentissage automatique et carnet de recherche au long cours, des fondements numériques jusqu’à l’autograd, l’attention et les transformers.",
+      en: "Rebuilds machine-learning components from numerical foundations through autograd, attention, and transformers, with each milestone documented and tested.",
+      fr: "Reconstruit les composants du machine learning, des fondations numériques jusqu’à l’autograd, l’attention et les transformers, avec chaque étape documentée et testée.",
     },
     context: {
-      en: "A personal, research-oriented learning project built around understanding before abstraction.",
-      fr: "Un projet personnel d’apprentissage orienté recherche, fondé sur la compréhension avant l’abstraction.",
+      en: "A personal research project used to study the mathematics, implementation choices, and failure modes behind modern ML frameworks.",
+      fr: "Un projet de recherche personnel consacré aux mathématiques, aux choix d’implémentation et aux modes de défaillance des frameworks de ML modernes.",
     },
     implementation: {
       en: ["Mathematical notes and milestone reports", "From-scratch implementations of core ML mechanisms", "Tests and comparisons with production-grade tools"],
@@ -51,8 +51,8 @@ export const projects = [
     id: "word-search-ocr",
     name: { en: "OCR Word-Search Solver", fr: "Solveur OCR de mots mêlés" },
     description: {
-      en: "A C application that recognizes a photographed word-search grid and solves it automatically.",
-      fr: "Une application en C qui reconnaît une grille de mots mêlés photographiée et la résout automatiquement.",
+      en: "Turns a photographed word-search puzzle into a reconstructed character grid, then finds its words automatically in C.",
+      fr: "Transforme la photographie d’une grille de mots mêlés en grille de caractères reconstruite, puis recherche automatiquement les mots en C.",
     },
     context: {
       en: "Second-year capstone project completed by a team of four.",
@@ -74,8 +74,8 @@ export const projects = [
     id: "multiplayer-game",
     name: "Castle of Demise",
     description: {
-      en: "A pixel-art-styled multiplayer first-person game developed in C# with Godot as a first-year capstone.",
-      fr: "Un jeu multijoueur en vue subjective, à l’esthétique pixel art, développé en C# avec Godot comme projet de fin de première année.",
+      en: "Delivers first-person multiplayer gameplay in C# and Godot, combining a pixel-art visual direction with networked game systems.",
+      fr: "Propose un gameplay multijoueur en vue subjective avec C# et Godot, associant une direction pixel art à des systèmes de jeu en réseau.",
     },
     context: {
       en: "A year-long team project completed by five students.",
@@ -149,7 +149,7 @@ export const projects = [
   }),
   academic({
     id: "minimake", name: "MiniMake",
-    description: { en: "A small Make-like build tool with rule parsing, variables, dependency resolution, and command execution.", fr: "Un outil de build inspiré de Make avec analyse des règles, variables, résolution des dépendances et exécution de commandes." },
+    description: { en: "Reimplements the essential Make workflow in C: parse rules and variables, resolve the dependency graph, and execute only the required commands.", fr: "Réimplémente en C le fonctionnement essentiel de Make : analyser règles et variables, résoudre le graphe de dépendances et n’exécuter que les commandes nécessaires." },
     context: { en: "A systems-programming mini-project written in C.", fr: "Un mini-projet de programmation système écrit en C." },
     implementation: { en: ["Makefile-style parsing", "Dependency graph resolution", "Incremental command execution"], fr: ["Analyse d’une syntaxe de type Makefile", "Résolution du graphe de dépendances", "Exécution incrémentale des commandes"] },
     repository: { access: "school-restricted", url: githubRepositoryUrl("epita-minimake") },
@@ -191,12 +191,12 @@ export const projects = [
   }),
   academic({
     id: "42sh", name: "42sh",
-    description: { en: "A shell written in C with a lexer, recursive parser, AST, expansions, pipelines, redirections, control flow, and built-ins.", fr: "Un shell écrit en C avec lexer, parseur récursif, AST, expansions, pipelines, redirections, structures de contrôle et commandes internes." },
+    description: { en: "Implements a POSIX-oriented shell in C, from tokenization and recursive parsing to expansions, pipelines, redirections, control flow, and built-ins.", fr: "Implémente en C un shell orienté POSIX, de la tokenisation et l’analyse récursive jusqu’aux expansions, pipelines, redirections, structures de contrôle et commandes internes." },
     context: { en: "A team systems project focused on POSIX shell behavior and robust testing.", fr: "Un projet système en équipe centré sur le comportement d’un shell POSIX et des tests robustes." },
     implementation: { en: ["Layered lexer, parser, and abstract syntax tree", "Process execution, pipes, redirections, and built-ins", "Unit and functional test suites"], fr: ["Lexer, parseur et arbre syntaxique en couches", "Exécution des processus, pipes, redirections et built-ins", "Tests unitaires et fonctionnels"] },
     contribution: {
-      en: "Led the four-person team and concentrated on the lexer and its integration with the parsing pipeline.",
-      fr: "Pilotage de l’équipe de quatre personnes, avec un travail principal sur le lexer et son intégration à la chaîne d’analyse.",
+      en: "Led the four-person team, implemented the lexer, and integrated its token stream with the recursive parsing pipeline.",
+      fr: "Pilotage de l’équipe de quatre personnes, implémentation du lexer et intégration de son flux de jetons à la chaîne d’analyse récursive.",
     },
     duration: { en: "1 month", fr: "1 mois" }, teamSize: 4, linkedinUrl: null,
     repository: { access: "school-restricted", url: githubRepositoryUrl("epita-42sh") },
@@ -213,12 +213,12 @@ export const projects = [
   }),
   academic({
     id: "image-library", name: { en: "Generic Image Library", fr: "Bibliothèque d’images générique" },
-    description: { en: "A C++20 image-processing library built around concepts, generic algorithms, morphological erosion, tests, and benchmarks.", fr: "Une bibliothèque de traitement d’images en C++20 fondée sur les concepts, les algorithmes génériques, l’érosion morphologique, les tests et les benchmarks." },
+    description: { en: "Uses C++20 concepts to expose one generic image interface across reusable algorithms, including morphological erosion, with correctness tests and benchmarks.", fr: "Utilise les concepts de C++20 pour proposer une interface d’image unique à des algorithmes réutilisables, dont l’érosion morphologique, avec tests de correction et benchmarks." },
     context: { en: "An academic modern-C++ project.", fr: "Un projet académique de C++ moderne." },
     implementation: { en: ["Concept-constrained generic image interface", "Reusable image algorithms including erosion", "Correctness tests and performance benchmarks"], fr: ["Interface d’image générique contrainte par concepts", "Algorithmes réutilisables dont l’érosion", "Tests de correction et benchmarks"] },
     contribution: {
-      en: "Served as the principal implementer and guided the generic, template-based architecture for the four-person team.",
-      fr: "Rôle d’implémentation principal et orientation de l’architecture générique fondée sur les templates au sein de l’équipe de quatre.",
+      en: "Led the four-person team, defined the concept-constrained architecture, and implemented most of the generic library.",
+      fr: "Pilotage de l’équipe de quatre personnes, définition de l’architecture contrainte par concepts et implémentation de la majeure partie de la bibliothèque générique.",
     },
     duration: { en: "3 weeks", fr: "3 semaines" }, teamSize: 4, linkedinUrl: null,
     repository: { access: "school-restricted", url: githubRepositoryUrl("epita-generic-image-library") },
@@ -226,12 +226,12 @@ export const projects = [
   }),
   academic({
     id: "tiger", name: { en: "Tiger Compiler", fr: "Compilateur Tiger" },
-    description: { en: "A compiler pipeline covering lexical and syntax analysis, AST transformations, binding, type checking, optimization, and LLVM translation.", fr: "Une chaîne de compilation couvrant analyses lexicale et syntaxique, transformations d’AST, liaison, typage, optimisation et traduction LLVM." },
+    description: { en: "Extends a supplied C++ compiler codebase across the full pipeline: parsing, AST transformations, binding, type checking, optimization, and LLVM translation.", fr: "Étend une base de compilateur C++ fournie sur toute la chaîne : analyse, transformations d’AST, liaison, typage, optimisation et traduction LLVM." },
     context: { en: "A large C++ compiler project built on a supplied codebase.", fr: "Un projet de compilateur C++ construit sur une base de code fournie." },
     implementation: { en: ["Lexer, parser, and typed abstract syntax tree", "Binding, desugaring, inlining, and type checking", "LLVM translation and runtime components"], fr: ["Lexer, parseur et arbre syntaxique typé", "Liaison, désugarisation, inlining et vérification des types", "Traduction LLVM et composants d’exécution"] },
     contribution: {
-      en: "Led the four-person team and acted as the principal developer across the compiler pipeline.",
-      fr: "Pilotage de l’équipe de quatre personnes et rôle de développement principal sur l’ensemble de la chaîne de compilation.",
+      en: "Led the four-person team and implemented the largest share of the compiler passes and their integration.",
+      fr: "Pilotage de l’équipe de quatre personnes et implémentation de la plus grande part des passes du compilateur et de leur intégration.",
     },
     duration: { en: "2 months", fr: "2 mois" }, teamSize: 4, linkedinUrl: null,
     repository: { access: "school-restricted", url: githubRepositoryUrl("epita-tiger") },
@@ -278,8 +278,8 @@ export const projects = [
       fr: ["Backend Quarkus et Java avec persistance PostgreSQL", "Frontend React, TypeScript et Vite", "Communication REST et WebSocket pour les salons, le chat, les files, la recherche et la lecture synchronisée"],
     },
     contribution: {
-      en: "Coordinated the five-person team and focused on backend architecture and implementation.",
-      fr: "Coordination de l’équipe de cinq personnes, avec un travail centré sur l’architecture et l’implémentation du backend.",
+      en: "Coordinated the five-person team and built the Java backend architecture supporting rooms, queues, chat, and synchronized playback.",
+      fr: "Coordination de l’équipe de cinq personnes et développement de l’architecture backend Java pour les salons, files d’attente, chat et lecture synchronisée.",
     },
     duration: { en: "1 month", fr: "1 mois" }, teamSize: 5, linkedinUrl: null,
     repository: { access: "school-restricted", url: githubRepositoryUrl("epita-ping") },
@@ -317,8 +317,8 @@ export const projects = [
     context: { en: "An operations-research and graph-algorithm project based on Montreal road networks.", fr: "Un projet de recherche opérationnelle et d’algorithmes de graphes fondé sur le réseau routier de Montréal." },
     implementation: { en: ["OpenStreetMap acquisition and graph transformation", "Road assignment, pathfinding, cost, and completion-time optimization", "Interactive Folium visualization and statistics"], fr: ["Acquisition OpenStreetMap et transformation du graphe", "Affectation des rues, recherche de chemins, coûts et optimisation du temps", "Visualisation Folium interactive et statistiques"] },
     contribution: {
-      en: "Led the four-person team and served as the principal implementer for the optimization pipeline and supporting application.",
-      fr: "Pilotage de l’équipe de quatre personnes et rôle d’implémentation principal pour la chaîne d’optimisation et l’application associée.",
+      en: "Led the four-person team and wrote roughly 90% of the application, from graph transformation and route optimization to statistics and map generation.",
+      fr: "Pilotage de l’équipe de quatre personnes et écriture d’environ 90 % de l’application, de la transformation du graphe et l’optimisation des itinéraires jusqu’aux statistiques et à la génération de cartes.",
     },
     duration: { en: "6 weeks", fr: "6 semaines" }, teamSize: 4, linkedinUrl: null,
     repository: { access: "school-restricted", url: githubRepositoryUrl("epita-ero1") },
@@ -378,4 +378,22 @@ export function getProjectById(id) {
 
 export function getAllTags() {
   return [...new Set(projects.flatMap((project) => project.tags))];
+}
+
+export const projectLanguageTags = Object.freeze([
+  "c",
+  "cpp",
+  "csharp",
+  "java",
+  "javascript",
+  "typescript",
+  "python",
+]);
+
+export function isProjectLanguageTag(tag) {
+  return projectLanguageTags.includes(tag);
+}
+
+export function getTopicTags() {
+  return getAllTags().filter((tag) => !isProjectLanguageTag(tag));
 }

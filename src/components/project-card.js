@@ -1,6 +1,7 @@
-import { getLocalized, getProjectName } from "../data/projects.js";
+import { getLocalized, getProjectName, isProjectLanguageTag } from "../data/projects.js";
 import { projectDetailUrl, projectFilterUrl } from "../router.js";
 import { icons } from "./icons.js";
+import { formatProjectPeriod } from "../data/project-dates.js";
 
 export function renderProjectCard(project, i18n, options = {}) {
   const { language, t } = i18n;
@@ -8,9 +9,12 @@ export function renderProjectCard(project, i18n, options = {}) {
   const description = getLocalized(project.description, language);
   const featured = options.featured ? " project-card-featured" : "";
   const filterVisibility = options.filterVisibility ?? "all";
+  const filterTag = options.filterTag ?? "all";
+  const filterLanguage = options.filterLanguage ?? "all";
   const status = project.status === "planned"
     ? `<span class="status-label">${t("projects.planned")}</span>`
     : "";
+  const period = formatProjectPeriod(project.id, language);
 
   return `
     <article class="project-card${featured} reveal" data-project="${project.id}" data-project-href="${projectDetailUrl(project.id)}" tabindex="0" role="link" aria-label="${name}">
@@ -20,7 +24,8 @@ export function renderProjectCard(project, i18n, options = {}) {
       </div>
       <div class="project-content">
         <div class="project-topline">
-          <p class="project-type">${t(`projects.${project.type}`)}</p>${status}
+          <p class="project-type">${t(`projects.${project.type}`)}</p>
+          <div class="project-card-meta">${status}${period ? `<time>${period}</time>` : ""}</div>
         </div>
         <div class="project-title-row">
           <h3>${name}</h3>
@@ -28,7 +33,12 @@ export function renderProjectCard(project, i18n, options = {}) {
         </div>
         <p class="project-description">${description}</p>
         <div class="tag-row">
-          ${project.tags.map((tag) => `<a href="${projectFilterUrl(tag, filterVisibility)}" data-project-filter data-project-tag="${tag}">${t(`tags.${tag}`)}</a>`).join("")}
+          ${project.tags.map((tag) => {
+            const href = isProjectLanguageTag(tag)
+              ? projectFilterUrl(filterTag, filterVisibility, tag)
+              : projectFilterUrl(tag, filterVisibility, filterLanguage);
+            return `<a href="${href}" data-project-filter data-project-tag="${tag}">${t(`tags.${tag}`)}</a>`;
+          }).join("")}
         </div>
       </div>
     </article>

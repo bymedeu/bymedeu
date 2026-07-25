@@ -7,6 +7,7 @@ export function getRoute() {
     return {
       page: "projects",
       tag: params.get("tag") || "all",
+      language: params.get("language") || "all",
       visibility: params.get("visibility") || "all",
     };
   }
@@ -26,9 +27,10 @@ export function getRoute() {
   return { page: "home", section };
 }
 
-export function projectFilterUrl(tag = "all", visibility = "all") {
+export function projectFilterUrl(tag = "all", visibility = "all", language = "all") {
   const params = new URLSearchParams();
   if (tag !== "all") params.set("tag", tag);
+  if (language !== "all") params.set("language", language);
   if (visibility !== "all") params.set("visibility", visibility);
   const query = params.toString();
   return `#/projects${query ? `?${query}` : ""}`;

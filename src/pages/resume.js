@@ -6,6 +6,10 @@ import { siteConfig } from "../../site.config.js";
 
 export function renderResumePage(i18n) {
   const { t } = i18n;
+  const timeline = [
+    ...resume.experience.map((entry) => ({ ...entry, category: "experience" })),
+    ...resume.education.map((entry) => ({ ...entry, category: "education" })),
+  ].sort((left, right) => left.displayOrder - right.displayOrder);
 
   return `
     <article class="resume-page container">
@@ -13,7 +17,6 @@ export function renderResumePage(i18n) {
         <div class="reveal">
           <p class="eyebrow">${t("resume.eyebrow")}</p>
           <h1>${t("resume.title")}</h1>
-          <p>${t("resume.intro")}</p>
         </div>
         <div class="resume-downloads reveal reveal-delay-1">
           <p class="section-kicker">${t("resume.pdfTitle")}</p>
@@ -22,8 +25,23 @@ export function renderResumePage(i18n) {
         </div>
       </header>
 
-      ${renderTimeline(t("resume.experience"), resume.experience, i18n)}
-      ${renderTimeline(t("resume.education"), resume.education, i18n)}
+      <section class="resume-chronology border-section">
+        <div class="chronology-heading reveal">
+          <p class="section-kicker">${t("resume.timelineKicker")}</p>
+          <div><h2>${t("resume.timelineTitle")}</h2></div>
+        </div>
+        <div class="timeline-filters reveal" role="group" aria-label="${t("resume.filterLabel")}">
+          <button class="active" type="button" data-timeline-filter="all" aria-pressed="true">${t("resume.filterAll")}<span>${timeline.length}</span></button>
+          <button type="button" data-timeline-filter="experience" aria-pressed="false">${t("resume.filterJobs")}<span>${resume.experience.length}</span></button>
+          <button type="button" data-timeline-filter="education" aria-pressed="false">${t("resume.filterEducation")}<span>${resume.education.length}</span></button>
+        </div>
+        <div class="timeline-stage">
+          <div class="timeline-rail" aria-hidden="true"></div>
+          <div class="resume-timeline">
+            ${timeline.map((entry, index) => renderTimelineEntry(entry, i18n, index)).join("")}
+          </div>
+        </div>
+      </section>
 
       <section class="resume-interests border-section reveal">
         <p class="section-kicker">${t("resume.beyondCode")}</p>
@@ -35,63 +53,112 @@ export function renderResumePage(i18n) {
   `;
 }
 
-export function setupResumePage() {}
+export function setupResumePage(root) {
+  setupTimelineFilters(root);
 
-function renderTimeline(title, entries, i18n) {
-  const primaryEntries = entries.filter((entry) => !entry.optional);
-  const optionalEntries = entries.filter((entry) => entry.optional);
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-  return `
-    <section class="resume-section border-section">
-      <p class="section-kicker reveal">${title}</p>
-      <div class="resume-timeline">
-        ${primaryEntries.map((entry, index) => renderTimelineEntry(entry, i18n, index === 0)).join("")}
-        ${optionalEntries.length ? `
-          <details class="resume-more reveal">
-            <summary><span>+</span>${i18n.t("resume.showMore")}</summary>
-            <div class="resume-more-grid">
-              ${optionalEntries.map((entry) => renderTimelineEntry(entry, i18n, false)).join("")}
-            </div>
-          </details>
-        ` : ""}
-      </div>
-    </section>
-  `;
+  root.querySelectorAll(".timeline-card").forEach((card) => {
+    card.addEventListener("pointermove", (event) => {
+      const bounds = card.getBoundingClientRect();
+      const horizontal = ((event.clientX - bounds.left) / bounds.width - 0.5) * 2;
+      const vertical = ((event.clientY - bounds.top) / bounds.height - 0.5) * 2;
+      card.style.setProperty("--timeline-tilt-x", `${vertical * -1.4}deg`);
+      card.style.setProperty("--timeline-tilt-y", `${horizontal * 2.2}deg`);
+    });
+    card.addEventListener("pointerleave", () => {
+      card.style.setProperty("--timeline-tilt-x", "0deg");
+      card.style.setProperty("--timeline-tilt-y", "0deg");
+    });
+  });
 }
 
-function renderTimelineEntry(entry, i18n, emphasize) {
+function setupTimelineFilters(root) {
+  const buttons = [...root.querySelectorAll("[data-timeline-filter]")];
+  const events = [...root.querySelectorAll("[data-timeline-category]")];
+
+  buttons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const filter = button.dataset.timelineFilter;
+      buttons.forEach((candidate) => {
+        const active = candidate === button;
+        candidate.classList.toggle("active", active);
+        candidate.setAttribute("aria-pressed", String(active));
+      });
+
+      const visibleEvents = events.filter((event) => filter === "all" || event.dataset.timelineCategory === filter);
+      events.forEach((event) => { event.hidden = !visibleEvents.includes(event); });
+      visibleEvents.forEach((event, index) => {
+        event.classList.toggle("timeline-event-left", index % 2 === 0);
+        event.classList.toggle("timeline-event-right", index % 2 !== 0);
+        event.classList.remove("visible");
+      });
+      requestAnimationFrame(() => {
+        visibleEvents.forEach((event, index) => {
+          window.setTimeout(() => event.classList.add("visible"), index * 55);
+        });
+      });
+    });
+  });
+}
+
+function renderTimelineEntry(entry, i18n, index) {
   const { language, t } = i18n;
   const location = getLocalized(entry.location, language);
   const linkedProjects = entry.projectIds.map(getProjectById).filter(Boolean);
+  const highlights = getLocalized(entry.highlights, language) ?? [];
+  const side = index % 2 === 0 ? "left" : "right";
 
   return `
-    <article class="timeline-entry reveal${emphasize ? " timeline-entry-featured" : ""}${entry.id === "esa" ? " timeline-entry-current" : ""}">
-      <p class="timeline-period">${getLocalized(entry.period, language)}</p>
-      <div class="timeline-content">
-        <div class="timeline-heading">
-          <div><h2>${getLocalized(entry.title, language)}</h2><p>${entry.organization}${location ? ` · ${location}` : ""}</p></div>
-          ${entry.id === "esa" ? `<span>${t("resume.current")}</span>` : ""}
+    <article class="timeline-event timeline-event-${side} timeline-reveal reveal${entry.secondary ? " timeline-event-secondary" : ""}" data-timeline-category="${entry.category}">
+      <div class="timeline-node" aria-hidden="true"><span></span></div>
+      <details class="timeline-card${entry.current ? " timeline-card-current" : ""}"${entry.id === "epita" ? " open" : ""}>
+        <summary class="timeline-card-summary">
+          <div class="timeline-meta">
+            <span>${t(`resume.${entry.category}`)}${entry.current ? ` · ${t("resume.current")}` : ""}</span>
+            <time>${getLocalized(entry.period, language)}</time>
+          </div>
+          <div class="timeline-heading">
+            <div>
+              <h3>${getLocalized(entry.title, language)}</h3>
+              <p>${entry.organization}${location ? ` · ${location}` : ""}</p>
+            </div>
+            <i aria-hidden="true">+</i>
+          </div>
+          <span class="timeline-expand-label">${t("resume.expand")}</span>
+        </summary>
+        <div class="timeline-expanded">
+          ${highlights.length ? `
+            <div class="timeline-achievements">
+              <p>${t("resume.evidence")}</p>
+              <ul>${highlights.map((highlight) => `<li>${highlight}</li>`).join("")}</ul>
+            </div>
+          ` : ""}
+          ${entry.skills?.length ? `
+            <div class="timeline-skills" aria-label="${t("resume.skills")}">
+              ${entry.skills.map((skill) => `<span>${skill}</span>`).join("")}
+            </div>
+          ` : ""}
+          ${renderProjectLinks(linkedProjects, i18n)}
         </div>
-        <p class="timeline-description">${getLocalized(entry.description, language)}</p>
-        ${renderProjectLinks(linkedProjects, i18n)}
-      </div>
+      </details>
     </article>
   `;
 }
 
 function renderProjectLinks(projects, { language, t }) {
   if (!projects.length) return "";
-  const featured = projects.slice(0, 3);
-  const additional = projects.slice(3);
+  const featured = projects.slice(0, 4);
+  const additional = projects.slice(4);
   const renderLink = (project) => `<a href="${projectDetailUrl(project.id)}">${getProjectName(project, language)}${icons.chevron}</a>`;
 
   return `
     <div class="timeline-projects" aria-label="${t("resume.relatedProjects")}">
-      <span>${t("resume.relatedProjects")}</span>
-      ${featured.map(renderLink).join("")}
+      <p>${t("resume.relatedProjects")}</p>
+      <div class="timeline-project-list">${featured.map(renderLink).join("")}</div>
       ${additional.length ? `
         <details class="project-more">
-          <summary aria-label="${t("resume.moreProjects")}">+${additional.length}</summary>
+          <summary><span>+</span>${t("resume.moreProjectsCount")(additional.length)}</summary>
           <div>${additional.map(renderLink).join("")}</div>
         </details>
       ` : ""}

@@ -5,7 +5,7 @@ export function renderFooter({ t }) {
     <footer class="footer border-section">
       <div class="container footer-inner">
         <a class="brand" href="#/"><span class="brand-mark" aria-hidden="true"></span><span>${siteConfig.identity.name}</span></a>
-        <p>${t("footer.motto")}</p>
+        <a href="mailto:${siteConfig.contact.recruiterAccessEmail}">${siteConfig.contact.recruiterAccessEmail}</a>
         <p>© ${new Date().getFullYear()} ${siteConfig.identity.name}</p>
       </div>
     </footer>

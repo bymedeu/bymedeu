@@ -19,8 +19,6 @@ export function renderHeader(i18n, route) {
           <a href="#/" ${isHome && !route.section ? 'aria-current="page"' : ""}>${t("nav.home")}</a>
           <a href="#/projects" ${isProjects ? 'aria-current="page"' : ""}>${t("nav.projects")}</a>
           <a href="#/resume" ${isResume ? 'aria-current="page"' : ""}>${t("nav.resume")}</a>
-          <a href="#/about">${t("nav.about")}</a>
-          <a href="#/contact">${t("nav.contact")}</a>
         </div>
         <div class="nav-actions">
           <div class="language-switch" role="group" aria-label="${t("nav.language")}">

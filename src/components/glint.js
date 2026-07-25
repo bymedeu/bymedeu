@@ -2,6 +2,7 @@ const STORAGE_KEY = "amadeo-portfolio-glint-mode";
 const TARGET_SELECTOR = [
   ".button:not(.repository-disabled)",
   ".project-card",
+  ".timeline-card-summary",
   ".timeline-projects a",
   ".cv-links a",
 ].join(",");
