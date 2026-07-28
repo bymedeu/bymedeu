@@ -110,49 +110,115 @@
 .button-secondary { border-color: #303030; background: #101010; }
 .button-secondary:hover { border-color: #484848; background: #151515; }
 
-.glint-target {
+.corona-target {
   position: relative;
   isolation: isolate;
   z-index: 0;
-  --glint-x: 50%;
-  --glint-y: 50%;
+  overflow: visible;
 }
 
-.glint-target::before,
-.glint-target::after {
-  content: "";
+.corona-aura {
+  position: absolute;
+  z-index: 0;
+  inset: -26px;
+  overflow: visible;
+  border-radius: inherit;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 260ms cubic-bezier(.22,1,.36,1);
+}
+
+.corona-aura > span {
   position: absolute;
   border-radius: inherit;
-  pointer-events: none;
+  -webkit-mask: linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation-delay: var(--corona-delay);
+  animation-play-state: paused;
 }
 
-.glint-target::before {
-  z-index: -1;
+.corona-aura-haze {
   inset: 0;
-  background: inherit;
-}
-
-.glint-target::after {
-  z-index: -2;
-  opacity: 0;
-  transition: opacity 140ms ease;
-  inset: -18px;
-  background: radial-gradient(120px circle at calc(var(--glint-x) + 18px) calc(var(--glint-y) + 18px),rgba(247,249,255,.95),rgba(177,190,211,.34) 36%,transparent 72%);
-  filter: blur(13px);
-}
-
-.glint-target:is(:hover,:focus-visible)::after { opacity: .92; }
-
-.timeline-card-summary.glint-target::before { background: #090909; }
-
-html[data-glint-mode="rgb"] .glint-target::after {
+  padding: 26px;
   background:
-    radial-gradient(105px circle at calc(var(--glint-x) + 42px) calc(var(--glint-y) - 2px),rgba(72,132,255,.9),transparent 70%),
-    radial-gradient(100px circle at calc(var(--glint-x) - 38px) calc(var(--glint-y) + 22px),rgba(255,63,112,.8),transparent 72%),
-    radial-gradient(90px circle at calc(var(--glint-x) + 5px) calc(var(--glint-y) + 45px),rgba(55,238,185,.65),transparent 72%);
+    radial-gradient(ellipse at 8% 44%,rgba(255,226,127,.58),rgba(224,76,20,.24) 20%,transparent 54%),
+    radial-gradient(ellipse at 93% 60%,rgba(90,207,255,.54),rgba(30,78,174,.22) 26%,transparent 58%),
+    radial-gradient(ellipse at 52% 4%,rgba(218,249,255,.38),rgba(85,64,130,.16) 30%,transparent 62%);
+  filter: blur(13px);
+  animation: corona-haze-drift 8.6s ease-in-out infinite alternate;
 }
 
-.project-card:has(.tag-row a:hover)::after { opacity: 0; }
+.corona-aura-plasma {
+  inset: 11px;
+  padding: 15px;
+  background:
+    radial-gradient(ellipse at 8% 35%,rgba(255,249,211,.95),rgba(255,191,43,.65) 24%,transparent 57%),
+    radial-gradient(ellipse at 88% 70%,rgba(215,248,255,.86),rgba(42,149,225,.56) 28%,transparent 62%),
+    conic-gradient(
+      from -28deg,
+      rgba(255,249,211,.9),
+      rgba(255,205,72,.82) 8%,
+      rgba(224,77,18,.68) 21%,
+      rgba(91,50,109,.45) 35%,
+      rgba(20,63,145,.58) 49%,
+      rgba(70,188,239,.72) 65%,
+      rgba(220,248,255,.9) 79%,
+      rgba(255,238,171,.82) 100%
+    );
+  filter: blur(5px);
+  animation: corona-plasma-drift 7.4s ease-in-out infinite alternate;
+}
+
+.corona-aura-rim {
+  inset: 22px;
+  padding: 4px;
+  background: conic-gradient(
+    from 214deg,
+    #fff9d9,
+    #ffd562 12%,
+    #e9691d 25%,
+    #6b416d 39%,
+    #184a9b 52%,
+    #5bc8ef 69%,
+    #e6fbff 84%,
+    #fff9d9
+  );
+  filter: blur(.8px);
+  animation: corona-rim-flicker 3.8s ease-in-out infinite alternate;
+}
+
+.corona-target:is(:hover,:focus-visible,:focus-within) > .corona-aura { opacity: .88; }
+.corona-target:is(:hover,:focus-visible,:focus-within) > .corona-aura > span { animation-play-state: running; }
+
+html[data-corona-mode="white"] .corona-aura-haze {
+  background:
+    radial-gradient(ellipse at 10% 45%,rgba(255,255,255,.54),transparent 52%),
+    radial-gradient(ellipse at 92% 57%,rgba(255,255,255,.42),rgba(215,222,230,.16) 30%,transparent 62%);
+}
+html[data-corona-mode="white"] .corona-aura-plasma {
+  background: conic-gradient(from -28deg,rgba(255,255,255,.98),rgba(204,211,220,.42),#fff,rgba(226,230,235,.54),#fff);
+}
+html[data-corona-mode="white"] .corona-aura-rim { background: #fff; }
+
+.project-card:has(.tag-row a:hover) > .corona-aura { opacity: 0; }
+
+@keyframes corona-plasma-drift {
+  from { opacity: .62; background-position: -7px 3px,7px -4px,0 0; }
+  58% { opacity: .96; }
+  to { opacity: .74; background-position: 8px -4px,-8px 5px,0 0; }
+}
+@keyframes corona-haze-drift {
+  from { opacity: .4; background-position: -8px 3px,8px -5px,0 7px; }
+  to { opacity: .78; background-position: 9px -4px,-7px 6px,5px -6px; }
+}
+@keyframes corona-rim-flicker {
+  0%,18% { opacity: .72; }
+  24% { opacity: 1; }
+  31%,72% { opacity: .8; }
+  78% { opacity: .98; }
+  100% { opacity: .76; }
+}
 
 .featured-projects,
 .all-projects { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 18px; }

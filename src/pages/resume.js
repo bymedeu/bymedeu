@@ -54,7 +54,8 @@ export function renderResumePage(i18n) {
 }
 
 export function setupResumePage(root) {
-  setupTimelineFilters(root);
+  const refreshTimelineMotion = setupTimelineMotion(root);
+  setupTimelineFilters(root, refreshTimelineMotion);
 
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
@@ -73,12 +74,16 @@ export function setupResumePage(root) {
   });
 }
 
-function setupTimelineFilters(root) {
+function setupTimelineFilters(root, refreshTimelineMotion) {
   const buttons = [...root.querySelectorAll("[data-timeline-filter]")];
   const events = [...root.querySelectorAll("[data-timeline-category]")];
+  let activeAnimations = [];
 
   buttons.forEach((button) => {
     button.addEventListener("click", () => {
+      activeAnimations.forEach((animation) => animation.cancel());
+      activeAnimations = [];
+
       const filter = button.dataset.timelineFilter;
       buttons.forEach((candidate) => {
         const active = candidate === button;
@@ -87,19 +92,82 @@ function setupTimelineFilters(root) {
       });
 
       const visibleEvents = events.filter((event) => filter === "all" || event.dataset.timelineCategory === filter);
-      events.forEach((event) => { event.hidden = !visibleEvents.includes(event); });
+      const visibleSet = new Set(visibleEvents);
+      events.forEach((event) => {
+        const hidden = !visibleSet.has(event);
+        event.hidden = hidden;
+        event.classList.toggle("timeline-event-filtered", hidden);
+        if (hidden) event.classList.remove("timeline-in-view");
+      });
       visibleEvents.forEach((event, index) => {
         event.classList.toggle("timeline-event-left", index % 2 === 0);
         event.classList.toggle("timeline-event-right", index % 2 !== 0);
-        event.classList.remove("visible");
       });
+
       requestAnimationFrame(() => {
+        refreshTimelineMotion();
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
         visibleEvents.forEach((event, index) => {
-          window.setTimeout(() => event.classList.add("visible"), index * 55);
+          if (!event.classList.contains("timeline-in-view")) return;
+          const horizontalOffset = event.classList.contains("timeline-event-left") ? -24 : 24;
+          if (!event.animate) return;
+          const targetOpacity = event.classList.contains("timeline-event-secondary") ? 0.55 : 1;
+          const animation = event.animate(
+            [
+              { opacity: 0, transform: `translate3d(${horizontalOffset}px, 12px, 0) scale(.985)` },
+              { opacity: targetOpacity, transform: "translate3d(0, 0, 0) scale(1)" },
+            ],
+            {
+              duration: 430,
+              delay: index * 45,
+              easing: "cubic-bezier(.22,1,.36,1)",
+            }
+          );
+          activeAnimations.push(animation);
         });
       });
     });
   });
+}
+
+function setupTimelineMotion(root) {
+  const events = [...root.querySelectorAll(".timeline-event")];
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const refresh = () => {
+    events.forEach((event) => {
+      if (event.hidden) return;
+      const bounds = event.getBoundingClientRect();
+      const inViewport = bounds.bottom > window.innerHeight * 0.06
+        && bounds.top < window.innerHeight * 0.92;
+      event.classList.toggle("timeline-in-view", inViewport);
+    });
+  };
+
+  if (reducedMotion || !("IntersectionObserver" in window)) {
+    events.forEach((event) => event.classList.add("timeline-in-view"));
+    return refresh;
+  }
+
+  let previousScrollY = window.scrollY;
+  const observer = new IntersectionObserver(
+    (entries) => {
+      const scrollingDown = window.scrollY >= previousScrollY;
+      previousScrollY = window.scrollY;
+
+      entries.forEach((entry) => {
+        if (entry.target.hidden) return;
+        entry.target.style.setProperty("--timeline-motion-y", scrollingDown ? "24px" : "-24px");
+        entry.target.classList.toggle("timeline-in-view", entry.isIntersecting);
+      });
+    },
+    { threshold: 0.12, rootMargin: "-6% 0px -8%" }
+  );
+
+  events.forEach((event) => observer.observe(event));
+  requestAnimationFrame(refresh);
+  return refresh;
 }
 
 function renderTimelineEntry(entry, i18n, index) {
@@ -110,7 +178,7 @@ function renderTimelineEntry(entry, i18n, index) {
   const side = index % 2 === 0 ? "left" : "right";
 
   return `
-    <article class="timeline-event timeline-event-${side} timeline-reveal reveal${entry.secondary ? " timeline-event-secondary" : ""}" data-timeline-category="${entry.category}">
+    <article class="timeline-event timeline-event-${side} timeline-reveal${entry.secondary ? " timeline-event-secondary" : ""}" data-timeline-category="${entry.category}">
       <div class="timeline-node" aria-hidden="true"><span></span></div>
       <details class="timeline-card${entry.current ? " timeline-card-current" : ""}"${entry.id === "epita" ? " open" : ""}>
         <summary class="timeline-card-summary">

@@ -6,7 +6,7 @@ import { renderProjectsPage, setupProjectsPage } from "./pages/projects.js";
 import { renderProjectDetailPage, setupProjectDetailPage } from "./pages/project-detail.js";
 import { renderResumePage, setupResumePage } from "./pages/resume.js";
 import { setupProjectCards } from "./components/project-card.js";
-import { setupGlint } from "./components/glint.js";
+import { setupCorona } from "./components/corona.js";
 import { getRoute, startRouter } from "./router.js";
 import { setupRevealAnimations } from "./reveal.js";
 import { siteConfig } from "../site.config.js";
@@ -54,14 +54,14 @@ export function createApp(root) {
     }
 
     setupProjectCards(root);
-    setupGlint(root);
+    setupCorona(root);
     setupRevealAnimations(root);
     restoreScroll(route, previousScroll);
   }
 
   function setupIndexInteractions(index) {
     setupProjectCards(index);
-    setupGlint(index);
+    setupCorona(index);
     setupRevealAnimations(index);
   }
 

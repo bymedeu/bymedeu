@@ -21,6 +21,8 @@ export const translations = {
       selectedProjects: "Selected projects",
       allProjects: "All projects",
       toolkit: "Toolkit",
+      coronaSolar: "Switch corona lighting to the solar palette",
+      coronaWhite: "Switch corona lighting to pure white",
     },
     contact: {
       cv: "Curriculum vitae",
@@ -149,6 +151,8 @@ export const translations = {
       selectedProjects: "Projets sélectionnés",
       allProjects: "Tous les projets",
       toolkit: "Outils",
+      coronaSolar: "Passer l’éclairage de la couronne au mode solaire",
+      coronaWhite: "Passer l’éclairage de la couronne au blanc pur",
     },
     contact: {
       cv: "Curriculum vitæ",
