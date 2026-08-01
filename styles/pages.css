@@ -45,26 +45,35 @@
   position: absolute;
   clip-path: polygon(50% 0,61% 31%,85% 15%,69% 39%,100% 50%,69% 61%,85% 85%,61% 69%,50% 100%,39% 69%,15% 85%,31% 61%,0 50%,31% 39%,15% 15%,39% 31%);
 }
-.corona-star-aura > i { display: block; font-style: normal; }
+.corona-star-aura > i {
+  display: block;
+  background-repeat: no-repeat;
+  font-style: normal;
+  animation-delay: var(--corona-delay);
+}
 .corona-star-haze {
   inset: 3%;
   background:
-    radial-gradient(circle at 29% 35%,#fff7c7 0 4%,rgba(255,186,40,.82) 9%,rgba(208,61,18,.42) 22%,transparent 52%),
-    radial-gradient(circle at 67% 67%,rgba(109,220,255,.8),rgba(25,71,165,.45) 31%,rgba(70,45,106,.2) 47%,transparent 68%);
+    radial-gradient(ellipse,#fff7c7 0 4%,rgba(255,186,40,.84) 12%,rgba(208,61,18,.45) 29%,transparent 64%),
+    radial-gradient(ellipse,rgba(109,220,255,.8),rgba(25,71,165,.48) 31%,rgba(70,45,106,.22) 49%,transparent 72%);
   filter: blur(17px);
-  animation: corona-star-haze 6.8s ease-in-out infinite alternate;
+  animation: corona-haze-cycle 18s cubic-bezier(.45,0,.55,1) infinite;
 }
 .corona-star-plasma {
   inset: 14%;
-  background: conic-gradient(from -28deg,#fff8cc,#ffd04e 10%,#e85b18 24%,#69406f 39%,#17468f 53%,#55c8f2 71%,#e4fbff 86%,#fff8cc);
+  background:
+    radial-gradient(ellipse,#fff 0 7%,#ffd04e 21%,#e85b18 43%,transparent 72%),
+    radial-gradient(ellipse,#ecfcff 0 9%,#55c8f2 29%,#17468f 54%,transparent 76%);
   filter: blur(6px);
-  animation: corona-star-plasma-drift 18s linear infinite;
+  animation: corona-plasma-cycle 18s cubic-bezier(.45,0,.55,1) infinite;
 }
 .corona-star-rim {
   inset: 20%;
-  background: conic-gradient(from 214deg,#fffbe3,#ffd357 13%,#e9631a 25%,#634171 40%,#164c9d 54%,#61cef2 71%,#ecfcff 85%,#fffbe3);
-  filter: blur(1.2px);
-  animation: corona-rim-flicker 4.2s ease-in-out infinite alternate;
+  background:
+    radial-gradient(ellipse,#fff 0 12%,#ffd357 31%,#e9631a 55%,transparent 79%),
+    radial-gradient(ellipse,#fff 0 14%,#61cef2 36%,#164c9d 63%,transparent 82%);
+  filter: blur(.9px);
+  animation: corona-rim-cycle 18s cubic-bezier(.45,0,.55,1) infinite;
 }
 .corona-star-shape {
   inset: 11%;
@@ -77,18 +86,35 @@
 .corona-toggle:is(:hover,:focus-visible) .corona-star-aura { filter: brightness(1.16); }
 .corona-toggle:is(:hover,:focus-visible) .corona-star-shape { transform: scale(.96) rotate(2deg); }
 .corona-toggle:focus-visible { outline: 1px solid #fff; outline-offset: 16px; }
-html[data-corona-mode="white"] .corona-star-haze { background: radial-gradient(circle,rgba(255,255,255,.75),rgba(218,224,231,.27) 37%,transparent 70%); }
-html[data-corona-mode="white"] .corona-star-plasma,
-html[data-corona-mode="white"] .corona-star-rim { background: #fff; }
-@keyframes corona-star-haze {
-  from { opacity: .58; transform: scale(.93) rotate(-2deg); }
-  55% { opacity: .9; }
-  to { opacity: .7; transform: scale(1.06) rotate(2deg); }
+html[data-corona-mode="white"] .corona-star-haze {
+  background: radial-gradient(ellipse,#fff 0 18%,rgba(255,255,255,.96) 42%,rgba(255,255,255,.3) 68%,transparent 78%);
+  filter: blur(12px) brightness(1.8);
 }
-@keyframes corona-star-plasma-drift {
-  0% { opacity: .72; transform: rotate(0deg) scale(.97); }
-  48% { opacity: .96; }
-  100% { opacity: .75; transform: rotate(360deg) scale(1.03); }
+html[data-corona-mode="white"] .corona-star-plasma {
+  background: radial-gradient(ellipse,#fff 0 30%,rgba(255,255,255,.88) 54%,transparent 78%);
+  filter: drop-shadow(0 0 10px #fff) blur(3px);
+}
+html[data-corona-mode="white"] .corona-star-rim {
+  background: #fff;
+  filter: drop-shadow(0 0 5px #fff) blur(.35px);
+}
+@keyframes corona-haze-cycle {
+  0%,100% { background-size: 38% 150%,96% 175%; background-position: -13% 50%,112% 50%; opacity: .62; }
+  25% { background-size: 82% 185%,66% 155%; background-position: -8% 48%,120% 54%; opacity: .92; }
+  50% { background-size: 116% 190%,52% 145%; background-position: 45% 52%,108% 48%; opacity: .76; }
+  75% { background-size: 62% 155%,104% 185%; background-position: -18% 55%,60% 48%; opacity: .68; }
+}
+@keyframes corona-plasma-cycle {
+  0%,100% { background-size: 28% 130%,88% 150%; background-position: -5% 46%,110% 55%; opacity: .75; }
+  27% { background-size: 72% 165%,55% 130%; background-position: -3% 50%,116% 52%; opacity: 1; }
+  52% { background-size: 105% 175%,38% 122%; background-position: 38% 50%,105% 50%; opacity: .83; }
+  76% { background-size: 48% 135%,92% 165%; background-position: -14% 52%,64% 48%; opacity: .72; }
+}
+@keyframes corona-rim-cycle {
+  0%,100% { background-size: 42% 145%,86% 155%; background-position: -12% 50%,110% 52%; opacity: .92; }
+  28% { background-size: 88% 165%,50% 135%; background-position: -8% 48%,118% 50%; opacity: 1; }
+  53% { background-size: 108% 175%,32% 120%; background-position: 35% 50%,104% 45%; opacity: .86; }
+  76% { background-size: 46% 135%,94% 165%; background-position: -15% 55%,62% 50%; opacity: .82; }
 }
 
 .hero {
@@ -273,18 +299,24 @@ blockquote { margin: 0; font-size: clamp(25px,3.7vw,47px); font-weight: 480; lin
 .timeline-event.timeline-reveal {
   --timeline-motion-x: -34px;
   --timeline-motion-y: 24px;
-  opacity: 0;
-  transform: translate3d(var(--timeline-motion-x),var(--timeline-motion-y),-18px) scale(.985);
+  opacity: 1;
+  transform: translate3d(0,0,0) scale(1);
   transition: opacity 520ms cubic-bezier(.22,1,.36,1),transform 600ms cubic-bezier(.22,1,.36,1);
 }
+.timeline-event.timeline-reveal.timeline-motion-ready {
+  opacity: 0;
+  transform: translate3d(var(--timeline-motion-x),var(--timeline-motion-y),-18px) scale(.985);
+}
 .timeline-event-right.timeline-reveal { --timeline-motion-x: 34px; }
-.timeline-event.timeline-reveal.timeline-in-view { opacity: 1; transform: translate3d(0,0,0) scale(1); }
+.timeline-event.timeline-reveal.timeline-motion-ready.timeline-in-view { opacity: 1; transform: translate3d(0,0,0) scale(1); }
 .timeline-node { position: absolute; z-index: 3; top: 31px; left: 50%; width: 18px; height: 18px; display: grid; place-items: center; transform: translateX(-50%) translateZ(25px); border: 1px solid #777; border-radius: 50%; background: #090909; box-shadow: 0 0 0 6px rgba(255,255,255,.035),0 0 22px rgba(255,255,255,.11); }
 .timeline-node span { width: 5px; height: 5px; border-radius: 50%; background: #dedede; box-shadow: 0 0 10px rgba(255,255,255,.65); }
-.timeline-card { position: relative; z-index: 2; overflow: visible; border: 1px solid #2c2c2c; border-radius: 12px; background: #090909; box-shadow: 0 18px 50px rgba(0,0,0,.24); transform-style: preserve-3d; --timeline-tilt-x: 0deg; --timeline-tilt-y: 0deg; --timeline-side-tilt: 0deg; --timeline-z: 0px; transform: perspective(1100px) rotateX(var(--timeline-tilt-x)) rotateY(calc(var(--timeline-tilt-y) + var(--timeline-side-tilt))) translateZ(var(--timeline-z)); transition: transform 180ms ease,border-color 180ms ease,box-shadow 180ms ease; }
-.timeline-event-left .timeline-card { grid-column: 1; --timeline-side-tilt: 1deg; }
-.timeline-event-right .timeline-card { grid-column: 3; --timeline-side-tilt: -1deg; }
-.timeline-card:hover,.timeline-card:focus-within { --timeline-z: 16px; border-color: #555; box-shadow: 0 24px 65px rgba(0,0,0,.38); }
+.timeline-card-shell { position: relative; z-index: 2; overflow: visible; border-radius: 12px; transform-style: preserve-3d; --timeline-tilt-x: 0deg; --timeline-tilt-y: 0deg; --timeline-side-tilt: 0deg; --timeline-z: 0px; transform: perspective(1100px) rotateX(var(--timeline-tilt-x)) rotateY(calc(var(--timeline-tilt-y) + var(--timeline-side-tilt))) translateZ(var(--timeline-z)); transition: transform 180ms ease; }
+.timeline-card { position: relative; z-index: 1; overflow: visible; border: 1px solid #2c2c2c; border-radius: 12px; background: #090909; box-shadow: 0 18px 50px rgba(0,0,0,.24); transition: border-color 180ms ease,box-shadow 180ms ease; }
+.timeline-event-left .timeline-card-shell { grid-column: 1; --timeline-side-tilt: 1deg; }
+.timeline-event-right .timeline-card-shell { grid-column: 3; --timeline-side-tilt: -1deg; }
+.timeline-card-shell:hover,.timeline-card-shell:focus-within { --timeline-z: 16px; }
+.timeline-card-shell:hover .timeline-card,.timeline-card-shell:focus-within .timeline-card { border-color: #555; box-shadow: 0 24px 65px rgba(0,0,0,.38); }
 .timeline-card[open],.timeline-card-current { border-color: #484848; }
 .timeline-event-secondary { opacity: .68; }
 .timeline-event-secondary.timeline-reveal.timeline-in-view { opacity: .55; }

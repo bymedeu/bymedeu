@@ -1,52 +1,18 @@
-<h1 align="center">Hi, I'm Amadéo.</h1>
+<h1 align="center">Amadéo Héaulme</h1>
 
 <p align="center">
-  Computer science student working across artificial intelligence, systems engineering, and research-oriented software.
-</p>
-
-<p align="center">
-  <a href="https://bymedeu.github.io/bymedeu/"><strong>Explore my interactive portfolio →</strong></a>
-</p>
-
-<p align="center">
-  Projects, technical case studies, interactive résumé, and contact information are maintained on the portfolio.
-</p>
-
-<img align="right" src="https://visitor-badge.laobi.icu/badge?page_id=bymedeu_visitor_badge_simple&left_color=royalblue&right_color=black" />
-
-<h3 align="center">Languages and tools</h3>
-
-<p align="center">
-  <a href="https://skillicons.dev">
-    <img src="https://skillicons.dev/icons?i=python,cpp,c,java,ocaml,js,ts,postgres,docker,linux,git,cmake,bash,vim,pytorch,tensorflow,sklearn" alt="Skills and tools"/>
+  <a href="https://bymedeu.github.io/bymedeu/">
+    <img src="https://img.shields.io/badge/Portfolio-View%20my%20work-111111?style=for-the-badge" alt="Portfolio" />
+  </a>
+  <a href="https://www.linkedin.com/in/amadeoheaulme/">
+    <img src="https://img.shields.io/badge/LinkedIn-Connect-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn" />
   </a>
 </p>
 
-<br>
+<p align="center">
+  <a href="https://bymedeu.github.io/bymedeu/">
+    <img width="600" src="./github-metrics.svg" alt="Amadéo Héaulme's GitHub activity, languages, contribution calendar, and featured projects" />
+  </a>
+</p>
 
-<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-top: 20px;">
-    <!-- Left Column: Metrics -->
-    <div style="flex: 1; max-width: 45%;">
-        <img align="left" width="50%" alt="GitHub metrics" src="https://raw.githubusercontent.com/bymedeu/bymedeu/refs/heads/main/github-metrics.svg">
-    </div>
-
-  <div style="flex: 1; max-width: 45%; text-align: left; margin-left: 20px;">
-        <h3>Connect with me</h3>
-        <p>
-            <a href="https://www.linkedin.com/in/amadeoheaulme/" target="_blank" style="text-decoration: none;">
-                <img src="https://skillicons.dev/icons?i=linkedin" alt="LinkedIn">
-            </a>
-        </p>
-
-  <h3>About Me</h3>
-        <p>
-            I'm a Computer Science student focused on Artificial Intelligence, currently interning at @ESA. My interests include machine learning, deep learning, data science, scientific computing, and the connection between space and AI.
-        </p>
-        <p>
-            I also care strongly about engineering fundamentals: C/C++, systems programming, algorithms, Linux, performance, and understanding what happens under the hood rather than only using high-level abstractions.
-        </p>
-        <p>
-            My long-term goal is to build a strong AI and research-oriented profile by combining solid software engineering, mathematical intuition, technical projects, and consistent learning habits.
-        </p>
-    </div>
-</div>
+<p align="center"><sub>Updated daily.</sub></p>

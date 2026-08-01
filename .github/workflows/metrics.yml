@@ -27,8 +27,7 @@ jobs:
           plugin_languages_limit: 8
           plugin_languages_ignored: html, css, scss, jupyter notebook, Makefile, llvm, M4
           commits_authoring: bymedeu, Amadeo Heaulme, Amadéo Heaulme, Medèu, amadeo.heaulme, Amadéo Héaulme
+          plugin_repositories: yes
+          plugin_repositories_featured: bymedeu/aurora, bymedeu/mystarceiling
           plugin_isocalendar: yes
           plugin_isocalendar_duration: full-year
-          plugin_habits: yes
-          plugin_habits_from: 200
-          plugin_habits_days: 14

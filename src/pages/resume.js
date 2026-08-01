@@ -59,7 +59,7 @@ export function setupResumePage(root) {
 
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-  root.querySelectorAll(".timeline-card").forEach((card) => {
+  root.querySelectorAll(".timeline-card-shell").forEach((card) => {
     card.addEventListener("pointermove", (event) => {
       const bounds = card.getBoundingClientRect();
       const horizontal = ((event.clientX - bounds.left) / bounds.width - 0.5) * 2;
@@ -78,11 +78,17 @@ function setupTimelineFilters(root, refreshTimelineMotion) {
   const buttons = [...root.querySelectorAll("[data-timeline-filter]")];
   const events = [...root.querySelectorAll("[data-timeline-category]")];
   let activeAnimations = [];
+  let transitionVersion = 0;
+  let pendingTarget = null;
 
   buttons.forEach((button) => {
     button.addEventListener("click", () => {
+      transitionVersion += 1;
+      const version = transitionVersion;
+      if (pendingTarget) commitVisibility(pendingTarget);
       activeAnimations.forEach((animation) => animation.cancel());
       activeAnimations = [];
+      pendingTarget = null;
 
       const filter = button.dataset.timelineFilter;
       buttons.forEach((candidate) => {
@@ -91,44 +97,91 @@ function setupTimelineFilters(root, refreshTimelineMotion) {
         candidate.setAttribute("aria-pressed", String(active));
       });
 
-      const visibleEvents = events.filter((event) => filter === "all" || event.dataset.timelineCategory === filter);
-      const visibleSet = new Set(visibleEvents);
-      events.forEach((event) => {
-        const hidden = !visibleSet.has(event);
-        event.hidden = hidden;
-        event.classList.toggle("timeline-event-filtered", hidden);
-        if (hidden) event.classList.remove("timeline-in-view");
-      });
-      visibleEvents.forEach((event, index) => {
-        event.classList.toggle("timeline-event-left", index % 2 === 0);
-        event.classList.toggle("timeline-event-right", index % 2 !== 0);
-      });
+      const targetEvents = events.filter((event) => filter === "all" || event.dataset.timelineCategory === filter);
+      const targetSet = new Set(targetEvents);
+      const currentEvents = events.filter((event) => !event.hidden);
+      const outgoing = currentEvents.filter((event) => !targetSet.has(event));
+      const incoming = targetEvents.filter((event) => event.hidden);
+      const staying = currentEvents.filter((event) => targetSet.has(event));
+      const previousTops = new Map(staying.map((event) => [event, event.getBoundingClientRect().top]));
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-      requestAnimationFrame(() => {
+      pendingTarget = targetEvents;
+      if (reducedMotion || !Element.prototype.animate) {
+        commitVisibility(targetEvents);
         refreshTimelineMotion();
-        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+        pendingTarget = null;
+        return;
+      }
 
-        visibleEvents.forEach((event, index) => {
+      const outgoingAnimations = outgoing.map((event) => {
+        const animation = event.animate(
+          [
+            { opacity: getComputedStyle(event).opacity, transform: "translate3d(0,0,0) scale(1)", filter: "blur(0)" },
+            { opacity: 0, transform: "translate3d(0,0,-180px) scale(.82)", filter: "blur(2px)" },
+          ],
+          { duration: 320, easing: "cubic-bezier(.4,0,.8,.2)", fill: "both" }
+        );
+        activeAnimations.push(animation);
+        return animation.finished.catch(() => {});
+      });
+
+      Promise.all(outgoingAnimations).then(() => {
+        if (version !== transitionVersion) return;
+
+        commitVisibility(targetEvents);
+        root.getBoundingClientRect();
+        refreshTimelineMotion();
+
+        staying.forEach((event) => {
+          if (event.hidden) return;
+          const verticalOffset = previousTops.get(event) - event.getBoundingClientRect().top;
+          if (Math.abs(verticalOffset) < 1) return;
+          const animation = event.animate(
+            [
+              { transform: `translate3d(0,${verticalOffset}px,0)` },
+              { transform: "translate3d(0,0,0)" },
+            ],
+            { duration: 480, easing: "cubic-bezier(.22,1,.36,1)" }
+          );
+          activeAnimations.push(animation);
+        });
+
+        incoming.forEach((event, index) => {
           if (!event.classList.contains("timeline-in-view")) return;
-          const horizontalOffset = event.classList.contains("timeline-event-left") ? -24 : 24;
-          if (!event.animate) return;
           const targetOpacity = event.classList.contains("timeline-event-secondary") ? 0.55 : 1;
           const animation = event.animate(
             [
-              { opacity: 0, transform: `translate3d(${horizontalOffset}px, 12px, 0) scale(.985)` },
-              { opacity: targetOpacity, transform: "translate3d(0, 0, 0) scale(1)" },
+              { opacity: 0, transform: "translate3d(0,0,-190px) scale(.8)", filter: "blur(2px)" },
+              { opacity: targetOpacity, transform: "translate3d(0,0,0) scale(1)", filter: "blur(0)" },
             ],
             {
-              duration: 430,
-              delay: index * 45,
-              easing: "cubic-bezier(.22,1,.36,1)",
+              duration: 540,
+              delay: index * 55,
+              easing: "cubic-bezier(.16,1,.3,1)",
             }
           );
           activeAnimations.push(animation);
         });
+
+        pendingTarget = null;
       });
     });
   });
+
+  function commitVisibility(visibleEvents) {
+    const visibleSet = new Set(visibleEvents);
+    events.forEach((event) => {
+      const hidden = !visibleSet.has(event);
+      event.hidden = hidden;
+      event.classList.toggle("timeline-event-filtered", hidden);
+      if (hidden) event.classList.remove("timeline-in-view");
+    });
+    visibleEvents.forEach((event, index) => {
+      event.classList.toggle("timeline-event-left", index % 2 === 0);
+      event.classList.toggle("timeline-event-right", index % 2 !== 0);
+    });
+  }
 }
 
 function setupTimelineMotion(root) {
@@ -166,7 +219,8 @@ function setupTimelineMotion(root) {
   );
 
   events.forEach((event) => observer.observe(event));
-  requestAnimationFrame(refresh);
+  refresh();
+  events.forEach((event) => event.classList.add("timeline-motion-ready"));
   return refresh;
 }
 
@@ -180,8 +234,9 @@ function renderTimelineEntry(entry, i18n, index) {
   return `
     <article class="timeline-event timeline-event-${side} timeline-reveal${entry.secondary ? " timeline-event-secondary" : ""}" data-timeline-category="${entry.category}">
       <div class="timeline-node" aria-hidden="true"><span></span></div>
-      <details class="timeline-card${entry.current ? " timeline-card-current" : ""}"${entry.id === "epita" ? " open" : ""}>
-        <summary class="timeline-card-summary">
+      <div class="timeline-card-shell">
+        <details class="timeline-card${entry.current ? " timeline-card-current" : ""}"${entry.id === "epita" ? " open" : ""}>
+          <summary class="timeline-card-summary">
           <div class="timeline-meta">
             <span>${t(`resume.${entry.category}`)}${entry.current ? ` · ${t("resume.current")}` : ""}</span>
             <time>${getLocalized(entry.period, language)}</time>
@@ -194,8 +249,8 @@ function renderTimelineEntry(entry, i18n, index) {
             <i aria-hidden="true">+</i>
           </div>
           <span class="timeline-expand-label">${t("resume.expand")}</span>
-        </summary>
-        <div class="timeline-expanded">
+          </summary>
+          <div class="timeline-expanded">
           ${highlights.length ? `
             <div class="timeline-achievements">
               <p>${t("resume.evidence")}</p>
@@ -208,8 +263,9 @@ function renderTimelineEntry(entry, i18n, index) {
             </div>
           ` : ""}
           ${renderProjectLinks(linkedProjects, i18n)}
-        </div>
-      </details>
+          </div>
+        </details>
+      </div>
     </article>
   `;
 }

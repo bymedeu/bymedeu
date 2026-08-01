@@ -83,8 +83,8 @@
     grid-template-columns: 28px minmax(0,1fr);
     min-height: 0;
   }
-  .timeline-event-left .timeline-card,
-  .timeline-event-right .timeline-card {
+  .timeline-event-left .timeline-card-shell,
+  .timeline-event-right .timeline-card-shell {
     grid-column: 2;
     --timeline-side-tilt: 0deg;
   }
@@ -99,7 +99,7 @@
     width: 17px;
     transform: none;
   }
-  .timeline-card {
+  .timeline-card-shell {
     transform: none !important;
   }
   .timeline-card > summary {
