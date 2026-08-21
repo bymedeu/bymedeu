@@ -17,6 +17,10 @@
   .repository-actions { width: 100%; }
   .resume-downloads { grid-template-columns: repeat(2,minmax(0,1fr)); }
   .resume-downloads .section-kicker { grid-column: 1/-1; }
+  .resume-directory-grid { grid-template-columns: 1fr; }
+  .resume-directory[data-active-filter="education"] .resume-group,
+  .resume-directory[data-active-filter="experience"] .resume-group { grid-column: auto; width: 100%; }
+  .resume-interests-compact .interest-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
   .home-work .featured-projects { grid-template-columns: 1fr 1fr; }
   .home-intro-grid { grid-template-columns: minmax(0,1fr) 160px; gap: 35px; }
   .corona-switch-wrap { min-height: 210px; }
@@ -69,6 +73,20 @@
     flex: 1 0 auto;
     justify-content: center;
   }
+  .resume-hero.resume-hero-compact { gap: 24px; }
+  .resume-hero-compact .resume-downloads { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .resume-directory-heading { align-items: flex-start; flex-direction: column; gap: 20px; }
+  .resume-directory .timeline-filters { margin: 0; }
+  .resume-entry-card > summary {
+    grid-template-columns: 44px minmax(0,1fr) 28px;
+    gap: 11px;
+    min-height: 76px;
+    padding: 12px;
+  }
+  .resume-organization-mark { width: 44px; height: 44px; }
+  .resume-entry-meta { grid-column: 2; grid-row: 2; justify-items: start; display: flex; align-items: center; }
+  .resume-entry-toggle { grid-column: 3; grid-row: 1 / span 2; }
+  .resume-entry-expanded { padding: 3px 14px 17px; }
   .detail-heading h1 { font-size: clamp(48px,14vw,72px); }
   .detail-art { height: 260px; }
   .repository-actions .button { width: 100%; }
@@ -121,4 +139,6 @@
   .project-title-row { flex-wrap: wrap; }
   .footer-inner { min-height: 105px; }
   .resume-downloads,.interest-grid { grid-template-columns: 1fr; }
+  .resume-hero-compact .resume-downloads,
+  .resume-interests-compact .interest-grid { grid-template-columns: 1fr; }
 }

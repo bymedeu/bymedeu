@@ -15,4 +15,8 @@
   </a>
 </p>
 
-<p align="center"><sub>Updated daily.</sub></p>
+<p align="center">
+  <img src="https://visitor-badge.laobi.icu/badge?page_id=bymedeu_visitor_badge_simple&left_color=royalblue&right_color=black" alt="Profile views" />
+  <br />
+  <sub>Updated daily.</sub>
+</p>

@@ -6,44 +6,44 @@ import { siteConfig } from "../../site.config.js";
 
 export function renderResumePage(i18n) {
   const { t } = i18n;
-  const timeline = [
-    ...resume.experience.map((entry) => ({ ...entry, category: "experience" })),
-    ...resume.education.map((entry) => ({ ...entry, category: "education" })),
-  ].sort((left, right) => left.displayOrder - right.displayOrder);
+  const groups = [
+    { key: "education", entries: sortEntries(resume.education) },
+    { key: "experience", entries: sortEntries(resume.experience) },
+  ];
+  const entryCount = groups.reduce((total, group) => total + group.entries.length, 0);
 
   return `
-    <article class="resume-page container">
-      <header class="resume-hero">
+    <article class="resume-page resume-container container">
+      <header class="resume-hero resume-hero-compact">
         <div class="reveal">
           <p class="eyebrow">${t("resume.eyebrow")}</p>
           <h1>${t("resume.title")}</h1>
         </div>
         <div class="resume-downloads reveal reveal-delay-1">
-          <p class="section-kicker">${t("resume.pdfTitle")}</p>
           <a class="button button-light" href="${siteConfig.cv.en}" target="_blank" rel="noreferrer">${t("contact.cvEn")}${icons.arrowUpRight}</a>
           <a class="button button-secondary" href="${siteConfig.cv.fr}" target="_blank" rel="noreferrer">${t("contact.cvFr")}${icons.arrowUpRight}</a>
         </div>
       </header>
 
-      <section class="resume-chronology border-section">
-        <div class="chronology-heading reveal">
-          <p class="section-kicker">${t("resume.timelineKicker")}</p>
-          <div><h2>${t("resume.timelineTitle")}</h2></div>
-        </div>
-        <div class="timeline-filters reveal" role="group" aria-label="${t("resume.filterLabel")}">
-          <button class="active" type="button" data-timeline-filter="all" aria-pressed="true">${t("resume.filterAll")}<span>${timeline.length}</span></button>
-          <button type="button" data-timeline-filter="experience" aria-pressed="false">${t("resume.filterJobs")}<span>${resume.experience.length}</span></button>
-          <button type="button" data-timeline-filter="education" aria-pressed="false">${t("resume.filterEducation")}<span>${resume.education.length}</span></button>
-        </div>
-        <div class="timeline-stage">
-          <div class="timeline-rail" aria-hidden="true"></div>
-          <div class="resume-timeline">
-            ${timeline.map((entry, index) => renderTimelineEntry(entry, i18n, index)).join("")}
+      <section class="resume-directory border-section" data-resume-directory>
+        <div class="resume-directory-heading reveal">
+          <div>
+            <p class="section-kicker">${t("resume.timelineKicker")}</p>
+            <h2>${t("resume.timelineTitle")}</h2>
           </div>
+          <div class="timeline-filters" role="group" aria-label="${t("resume.filterLabel")}">
+            <button class="active" type="button" data-resume-filter="all" aria-pressed="true">${t("resume.filterAll")}<span>${entryCount}</span></button>
+            <button type="button" data-resume-filter="education" aria-pressed="false">${t("resume.filterEducation")}<span>${resume.education.length}</span></button>
+            <button type="button" data-resume-filter="experience" aria-pressed="false">${t("resume.filterJobs")}<span>${resume.experience.length}</span></button>
+          </div>
+        </div>
+
+        <div class="resume-directory-grid">
+          ${groups.map((group) => renderResumeGroup(group, i18n)).join("")}
         </div>
       </section>
 
-      <section class="resume-interests border-section reveal">
+      <section class="resume-interests resume-interests-compact border-section reveal">
         <p class="section-kicker">${t("resume.beyondCode")}</p>
         <div class="interest-grid">
           ${t("resume.interests").map((interest) => `<div><span>${interest.label}</span><p>${interest.copy}</p></div>`).join("")}
@@ -54,220 +54,164 @@ export function renderResumePage(i18n) {
 }
 
 export function setupResumePage(root) {
-  const refreshTimelineMotion = setupTimelineMotion(root);
-  setupTimelineFilters(root, refreshTimelineMotion);
-
-  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
-  root.querySelectorAll(".timeline-card-shell").forEach((card) => {
-    card.addEventListener("pointermove", (event) => {
-      const bounds = card.getBoundingClientRect();
-      const horizontal = ((event.clientX - bounds.left) / bounds.width - 0.5) * 2;
-      const vertical = ((event.clientY - bounds.top) / bounds.height - 0.5) * 2;
-      card.style.setProperty("--timeline-tilt-x", `${vertical * -1.4}deg`);
-      card.style.setProperty("--timeline-tilt-y", `${horizontal * 2.2}deg`);
-    });
-    card.addEventListener("pointerleave", () => {
-      card.style.setProperty("--timeline-tilt-x", "0deg");
-      card.style.setProperty("--timeline-tilt-y", "0deg");
-    });
-  });
+  setupResumeFilters(root);
+  setupEntryPanels(root);
+  setupEntryMotion(root);
 }
 
-function setupTimelineFilters(root, refreshTimelineMotion) {
-  const buttons = [...root.querySelectorAll("[data-timeline-filter]")];
-  const events = [...root.querySelectorAll("[data-timeline-category]")];
-  let activeAnimations = [];
-  let transitionVersion = 0;
-  let pendingTarget = null;
+function setupResumeFilters(root) {
+  const directory = root.querySelector("[data-resume-directory]");
+  const buttons = [...root.querySelectorAll("[data-resume-filter]")];
+  const groups = [...root.querySelectorAll("[data-resume-group]")];
+  if (!directory || !buttons.length || !groups.length) return;
 
   buttons.forEach((button) => {
     button.addEventListener("click", () => {
-      transitionVersion += 1;
-      const version = transitionVersion;
-      if (pendingTarget) commitVisibility(pendingTarget);
-      activeAnimations.forEach((animation) => animation.cancel());
-      activeAnimations = [];
-      pendingTarget = null;
+      const filter = button.dataset.resumeFilter;
+      if (button.classList.contains("active")) return;
 
-      const filter = button.dataset.timelineFilter;
+      const firstRects = new Map(
+        groups.filter((group) => !group.hidden).map((group) => [group, group.getBoundingClientRect()])
+      );
+
       buttons.forEach((candidate) => {
         const active = candidate === button;
         candidate.classList.toggle("active", active);
         candidate.setAttribute("aria-pressed", String(active));
       });
 
-      const targetEvents = events.filter((event) => filter === "all" || event.dataset.timelineCategory === filter);
-      const targetSet = new Set(targetEvents);
-      const currentEvents = events.filter((event) => !event.hidden);
-      const outgoing = currentEvents.filter((event) => !targetSet.has(event));
-      const incoming = targetEvents.filter((event) => event.hidden);
-      const staying = currentEvents.filter((event) => targetSet.has(event));
-      const previousTops = new Map(staying.map((event) => [event, event.getBoundingClientRect().top]));
-      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-      pendingTarget = targetEvents;
-      if (reducedMotion || !Element.prototype.animate) {
-        commitVisibility(targetEvents);
-        refreshTimelineMotion();
-        pendingTarget = null;
-        return;
-      }
-
-      const outgoingAnimations = outgoing.map((event) => {
-        const animation = event.animate(
-          [
-            { opacity: getComputedStyle(event).opacity, transform: "translate3d(0,0,0) scale(1)", filter: "blur(0)" },
-            { opacity: 0, transform: "translate3d(0,0,-180px) scale(.82)", filter: "blur(2px)" },
-          ],
-          { duration: 320, easing: "cubic-bezier(.4,0,.8,.2)", fill: "both" }
-        );
-        activeAnimations.push(animation);
-        return animation.finished.catch(() => {});
+      groups.forEach((group) => {
+        group.getAnimations().forEach((animation) => animation.cancel());
+        group.hidden = filter !== "all" && group.dataset.resumeGroup !== filter;
       });
+      directory.dataset.activeFilter = filter;
 
-      Promise.all(outgoingAnimations).then(() => {
-        if (version !== transitionVersion) return;
+      if (prefersReducedMotion() || !Element.prototype.animate) return;
 
-        commitVisibility(targetEvents);
-        root.getBoundingClientRect();
-        refreshTimelineMotion();
-
-        staying.forEach((event) => {
-          if (event.hidden) return;
-          const verticalOffset = previousTops.get(event) - event.getBoundingClientRect().top;
-          if (Math.abs(verticalOffset) < 1) return;
-          const animation = event.animate(
-            [
-              { transform: `translate3d(0,${verticalOffset}px,0)` },
-              { transform: "translate3d(0,0,0)" },
-            ],
-            { duration: 480, easing: "cubic-bezier(.22,1,.36,1)" }
-          );
-          activeAnimations.push(animation);
-        });
-
-        incoming.forEach((event, index) => {
-          if (!event.classList.contains("timeline-in-view")) return;
-          const targetOpacity = event.classList.contains("timeline-event-secondary") ? 0.55 : 1;
-          const animation = event.animate(
-            [
-              { opacity: 0, transform: "translate3d(0,0,-190px) scale(.8)", filter: "blur(2px)" },
-              { opacity: targetOpacity, transform: "translate3d(0,0,0) scale(1)", filter: "blur(0)" },
-            ],
-            {
-              duration: 540,
-              delay: index * 55,
-              easing: "cubic-bezier(.16,1,.3,1)",
-            }
-          );
-          activeAnimations.push(animation);
-        });
-
-        pendingTarget = null;
+      groups.filter((group) => !group.hidden).forEach((group, index) => {
+        const first = firstRects.get(group);
+        const last = group.getBoundingClientRect();
+        const translateX = first ? first.left - last.left : 0;
+        const translateY = first ? first.top - last.top : 14;
+        group.animate(
+          [
+            { opacity: first ? 1 : 0, transform: `translate3d(${translateX}px,${translateY}px,${first ? 0 : -30}px) scale(${first ? 1 : .985})` },
+            { opacity: 1, transform: "translate3d(0,0,0) scale(1)" },
+          ],
+          { duration: 440, delay: index * 45, easing: "cubic-bezier(.16,1,.3,1)" }
+        );
       });
     });
   });
-
-  function commitVisibility(visibleEvents) {
-    const visibleSet = new Set(visibleEvents);
-    events.forEach((event) => {
-      const hidden = !visibleSet.has(event);
-      event.hidden = hidden;
-      event.classList.toggle("timeline-event-filtered", hidden);
-      if (hidden) event.classList.remove("timeline-in-view");
-    });
-    visibleEvents.forEach((event, index) => {
-      event.classList.toggle("timeline-event-left", index % 2 === 0);
-      event.classList.toggle("timeline-event-right", index % 2 !== 0);
-    });
-  }
 }
 
-function setupTimelineMotion(root) {
-  const events = [...root.querySelectorAll(".timeline-event")];
-  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-  const refresh = () => {
-    events.forEach((event) => {
-      if (event.hidden) return;
-      const bounds = event.getBoundingClientRect();
-      const inViewport = bounds.bottom > window.innerHeight * 0.06
-        && bounds.top < window.innerHeight * 0.92;
-      event.classList.toggle("timeline-in-view", inViewport);
+function setupEntryPanels(root) {
+  root.querySelectorAll(".resume-entry-card").forEach((details) => {
+    details.addEventListener("toggle", () => {
+      const expanded = details.querySelector(".resume-entry-expanded");
+      if (!details.open || !expanded || prefersReducedMotion() || !Element.prototype.animate) return;
+      expanded.animate(
+        [
+          { opacity: 0, transform: "translateY(-10px)" },
+          { opacity: 1, transform: "translateY(0)" },
+        ],
+        { duration: 320, easing: "cubic-bezier(.16,1,.3,1)" }
+      );
     });
-  };
+  });
+}
 
-  if (reducedMotion || !("IntersectionObserver" in window)) {
-    events.forEach((event) => event.classList.add("timeline-in-view"));
-    return refresh;
+function setupEntryMotion(root) {
+  const entries = [...root.querySelectorAll(".resume-entry-shell")];
+  if (prefersReducedMotion() || !("IntersectionObserver" in window)) {
+    entries.forEach((entry) => entry.classList.add("resume-entry-visible"));
+    return;
   }
 
-  let previousScrollY = window.scrollY;
   const observer = new IntersectionObserver(
-    (entries) => {
-      const scrollingDown = window.scrollY >= previousScrollY;
-      previousScrollY = window.scrollY;
-
-      entries.forEach((entry) => {
-        if (entry.target.hidden) return;
-        entry.target.style.setProperty("--timeline-motion-y", scrollingDown ? "24px" : "-24px");
-        entry.target.classList.toggle("timeline-in-view", entry.isIntersecting);
+    (observed) => {
+      observed.forEach(({ target, isIntersecting }) => {
+        target.classList.toggle("resume-entry-visible", isIntersecting);
       });
     },
-    { threshold: 0.12, rootMargin: "-6% 0px -8%" }
+    { threshold: 0.08, rootMargin: "-3% 0px -5%" }
   );
 
-  events.forEach((event) => observer.observe(event));
-  refresh();
-  events.forEach((event) => event.classList.add("timeline-motion-ready"));
-  return refresh;
+  entries.forEach((entry, index) => {
+    entry.style.setProperty("--resume-entry-delay", `${Math.min(index, 4) * 45}ms`);
+    if (entry.getBoundingClientRect().top < window.innerHeight * 0.96) {
+      entry.classList.add("resume-entry-visible");
+    }
+    entry.classList.add("resume-entry-motion-ready");
+    observer.observe(entry);
+  });
 }
 
-function renderTimelineEntry(entry, i18n, index) {
+function renderResumeGroup(group, i18n) {
+  const { t } = i18n;
+  return `
+    <section class="resume-group" data-resume-group="${group.key}">
+      <header class="resume-group-heading">
+        <h2>${t(`resume.${group.key}`)}</h2>
+        <span>${String(group.entries.length).padStart(2, "0")}</span>
+      </header>
+      <div class="resume-entry-list">
+        ${group.entries.map((entry) => renderResumeEntry({ ...entry, category: group.key }, i18n)).join("")}
+      </div>
+    </section>
+  `;
+}
+
+function renderResumeEntry(entry, i18n) {
   const { language, t } = i18n;
   const location = getLocalized(entry.location, language);
   const linkedProjects = entry.projectIds.map(getProjectById).filter(Boolean);
   const highlights = getLocalized(entry.highlights, language) ?? [];
-  const side = index % 2 === 0 ? "left" : "right";
 
   return `
-    <article class="timeline-event timeline-event-${side} timeline-reveal${entry.secondary ? " timeline-event-secondary" : ""}" data-timeline-category="${entry.category}">
-      <div class="timeline-node" aria-hidden="true"><span></span></div>
-      <div class="timeline-card-shell">
-        <details class="timeline-card${entry.current ? " timeline-card-current" : ""}"${entry.id === "epita" ? " open" : ""}>
-          <summary class="timeline-card-summary">
-          <div class="timeline-meta">
-            <span>${t(`resume.${entry.category}`)}${entry.current ? ` · ${t("resume.current")}` : ""}</span>
+    <div class="resume-entry-shell${entry.secondary ? " resume-entry-secondary" : ""}" data-resume-entry>
+      <details class="resume-entry-card${entry.current ? " resume-entry-current" : ""}">
+        <summary>
+          ${renderOrganizationMark(entry)}
+          <span class="resume-entry-copy">
+            <strong>${getLocalized(entry.title, language)}</strong>
+            <span>${entry.organization}${location ? ` · ${location}` : ""}</span>
+          </span>
+          <span class="resume-entry-meta">
             <time>${getLocalized(entry.period, language)}</time>
-          </div>
-          <div class="timeline-heading">
-            <div>
-              <h3>${getLocalized(entry.title, language)}</h3>
-              <p>${entry.organization}${location ? ` · ${location}` : ""}</p>
-            </div>
-            <i aria-hidden="true">+</i>
-          </div>
-          <span class="timeline-expand-label">${t("resume.expand")}</span>
-          </summary>
-          <div class="timeline-expanded">
+            ${entry.current ? `<em>${t("resume.current")}</em>` : ""}
+          </span>
+          <i class="resume-entry-toggle" aria-hidden="true">+</i>
+        </summary>
+        <div class="resume-entry-expanded">
           ${highlights.length ? `
-            <div class="timeline-achievements">
+            <div class="resume-entry-achievements">
               <p>${t("resume.evidence")}</p>
               <ul>${highlights.map((highlight) => `<li>${highlight}</li>`).join("")}</ul>
             </div>
           ` : ""}
           ${entry.skills?.length ? `
-            <div class="timeline-skills" aria-label="${t("resume.skills")}">
+            <div class="resume-entry-skills" aria-label="${t("resume.skills")}">
               ${entry.skills.map((skill) => `<span>${skill}</span>`).join("")}
             </div>
           ` : ""}
           ${renderProjectLinks(linkedProjects, i18n)}
-          </div>
-        </details>
-      </div>
-    </article>
+        </div>
+      </details>
+    </div>
   `;
+}
+
+function renderOrganizationMark(entry) {
+  if (entry.logo) {
+    return `
+      <span class="resume-organization-mark resume-organization-logo${entry.logo.tone === "dark" ? " resume-organization-logo-dark" : ""}" aria-hidden="true">
+        <img src="${entry.logo.src}" alt="">
+      </span>
+    `;
+  }
+
+  return `<span class="resume-organization-mark" aria-hidden="true">${entry.mark ?? initials(entry.organization)}</span>`;
 }
 
 function renderProjectLinks(projects, { language, t }) {
@@ -277,9 +221,9 @@ function renderProjectLinks(projects, { language, t }) {
   const renderLink = (project) => `<a href="${projectDetailUrl(project.id)}">${getProjectName(project, language)}${icons.chevron}</a>`;
 
   return `
-    <div class="timeline-projects" aria-label="${t("resume.relatedProjects")}">
+    <div class="resume-entry-projects" aria-label="${t("resume.relatedProjects")}">
       <p>${t("resume.relatedProjects")}</p>
-      <div class="timeline-project-list">${featured.map(renderLink).join("")}</div>
+      <div class="resume-project-list">${featured.map(renderLink).join("")}</div>
       ${additional.length ? `
         <details class="project-more">
           <summary><span>+</span>${t("resume.moreProjectsCount")(additional.length)}</summary>
@@ -288,4 +232,22 @@ function renderProjectLinks(projects, { language, t }) {
       ` : ""}
     </div>
   `;
+}
+
+function sortEntries(entries) {
+  return [...entries].sort((left, right) => left.displayOrder - right.displayOrder);
+}
+
+function initials(name) {
+  return name
+    .split(/[\s-]+/)
+    .filter((part) => part.length > 2)
+    .slice(0, 3)
+    .map((part) => part[0])
+    .join("")
+    .toUpperCase();
+}
+
+function prefersReducedMotion() {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }

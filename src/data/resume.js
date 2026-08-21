@@ -8,6 +8,7 @@ export const resume = {
       period: { en: "2026 — Present", fr: "2026 — aujourd’hui" },
       title: { en: "Software Engineering Intern", fr: "Stagiaire en ingénierie logicielle" },
       organization: "European Space Agency",
+      logo: { src: "public/logos/esa.svg", alt: "ESA", tone: "dark" },
       location: null,
       highlights: {
         en: [
@@ -32,6 +33,7 @@ export const resume = {
       period: { en: "Sep. 2025 — Jan. 2028", fr: "Sept. 2025 — janv. 2028" },
       title: { en: "Teaching Assistant", fr: "Assistant pédagogique" },
       organization: "EPITA",
+      logo: { src: "public/logos/epita.png", alt: "EPITA" },
       location: { en: "Toulouse, France", fr: "Toulouse, France" },
       highlights: {
         en: [
@@ -58,6 +60,7 @@ export const resume = {
       period: { en: "Aug. 2024 — Aug. 2026", fr: "Août 2024 — août 2026" },
       title: { en: "Executive Board Member · Treasurer", fr: "Membre du bureau · Trésorier" },
       organization: "Back to Basics",
+      mark: "B2B",
       location: { en: "Paris, France", fr: "Paris, France" },
       highlights: {
         en: [
@@ -84,6 +87,7 @@ export const resume = {
       period: { en: "Jul. — Aug. 2024", fr: "Juil. — août 2024" },
       title: { en: "Summer Sales Employee", fr: "Employé polyvalent" },
       organization: "Midica",
+      mark: "MID",
       location: { en: "Toulouse, France", fr: "Toulouse, France" },
       highlights: {
         en: [
@@ -110,6 +114,7 @@ export const resume = {
       period: { en: "2023 — 2028", fr: "2023 — 2028" },
       title: { en: "Computer Engineering Student", fr: "Étudiant ingénieur en informatique" },
       organization: "EPITA",
+      logo: { src: "public/logos/epita.png", alt: "EPITA" },
       location: { en: "Toulouse, France", fr: "Toulouse, France" },
       highlights: {
         en: [
@@ -155,6 +160,7 @@ export const resume = {
       period: { en: "Feb. — Jun. 2025", fr: "Févr. — juin 2025" },
       title: { en: "Exchange Semester", fr: "Semestre d’échange" },
       organization: "Ewha Womans University",
+      logo: { src: "public/logos/ewha.png", alt: "Ewha Womans University" },
       location: { en: "Seoul, South Korea", fr: "Séoul, Corée du Sud" },
       highlights: {
         en: [
@@ -179,6 +185,7 @@ export const resume = {
       period: { en: "2020 — 2023", fr: "2020 — 2023" },
       title: { en: "French Baccalauréat · Mathematics & Physics", fr: "Baccalauréat · Mathématiques & Physique-Chimie" },
       organization: "Lycée Saint-Sernin",
+      mark: "SS",
       location: { en: "Toulouse, France", fr: "Toulouse, France" },
       highlights: {
         en: [
