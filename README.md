@@ -11,7 +11,7 @@
 
 <p align="center">
   <a href="https://bymedeu.github.io/bymedeu/">
-    <img width="600" src="./github-metrics.svg" alt="Amadéo Héaulme's GitHub activity, languages, contribution calendar, and featured projects" />
+    <img width="800" src="./github-metrics.svg" alt="Amadéo Héaulme's GitHub activity, languages, and featured projects" />
   </a>
 </p>
 
