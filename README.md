@@ -1,7 +1,7 @@
 <h1 align="center">Amadéo Héaulme</h1>
 
 <p align="center">
-  <a href="amhe.me">
+  <a href="https://amhe.me">
     <img src="https://img.shields.io/badge/Portfolio-View%20my%20work-111111?style=for-the-badge" alt="Portfolio" />
   </a>
   <a href="https://www.linkedin.com/in/amadeoheaulme/">
