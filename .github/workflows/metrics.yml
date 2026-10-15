@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - ".github/workflows/metrics.yml"
+      - "scripts/extract-languages.py"
   schedule:
     - cron: "0 0 * * *"
   workflow_dispatch:
@@ -33,9 +34,27 @@ jobs:
           plugin_languages_analysis_timeout: 30
           plugin_languages_analysis_timeout_repositories: 10
           plugin_languages_sections: most-used
-          plugin_languages_details: bytes-size, percentage
+          plugin_languages_details: lines, percentage
           plugin_languages_limit: 8
           plugin_languages_ignored: html, css, scss, jupyter notebook, Makefile, llvm, M4
           commits_authoring: bymedeu, Amadeo Heaulme, Amadéo Heaulme, Medèu, amadeo.heaulme, Amadéo Héaulme
           plugin_repositories: yes
           plugin_repositories_featured: bymedeu/aurora, bymedeu/mystarceiling
+
+      # Check out the SVG just committed by Lowlighter, then reuse its analysis.
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - name: Extract language chart for profile
+        run: python3 scripts/extract-languages.py
+
+      - name: Publish language chart
+        run: |
+          git add github-languages.svg
+          if ! git diff --cached --quiet; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git commit -m "chore: update profile language chart [skip ci]"
+            git push
+          fi

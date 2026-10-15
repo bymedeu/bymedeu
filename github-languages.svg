@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="936" height="140" viewBox="0 0 936 140" role="img" aria-labelledby="title">
+  <title id="title">Language distribution — Lowlighter Metrics</title>
+  <style>text{font:14px -apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif;fill:#57606a}@media(prefers-color-scheme:dark){text{fill:#c9d1d9}}</style>
+  <text x="8" y="18">Language distribution</text>
+  <svg class="bar" width="920" height="8" x="8" y="30">
+    <mask id="languages-bar">
+      <rect x="0" y="0" width="920" height="8" fill="white" rx="5" />
+    </mask>
+    <rect mask="url(#languages-bar)" x="0" y="0" width="0" height="8" fill="#d1d5da" />
+    <rect mask="url(#languages-bar)" x="0" y="0" width="284.3093897367945" height="8" fill="#f1e05a" />
+    <rect mask="url(#languages-bar)" x="284.3093897367945" y="0" width="226.04089223197366" height="8" fill="#3572A5" />
+    <rect mask="url(#languages-bar)" x="510.3502819687681" y="0" width="201.49394562818398" height="8" fill="#f34b7d" />
+    <rect mask="url(#languages-bar)" x="711.8442275969521" y="0" width="107.22747006097015" height="8" fill="#89e051" />
+    <rect mask="url(#languages-bar)" x="819.0716976579223" y="0" width="35.6200088615784" height="8" fill="#000080" />
+    <rect mask="url(#languages-bar)" x="854.6917065195006" y="0" width="27.39271977650517" height="8" fill="#555555" />
+    <rect mask="url(#languages-bar)" x="882.0844262960057" y="0" width="26.459757825127358" height="8" fill="#DA3434" />
+    <rect mask="url(#languages-bar)" x="908.5441841211332" y="0" width="11.4558158788668" height="8" fill="#ededed" />
+  </svg>
+  <circle cx="13" cy="57" r="5" fill="#f1e05a" />
+  <text x="26" y="62">JavaScript 30.9%</text>
+  <circle cx="243" cy="57" r="5" fill="#3572A5" />
+  <text x="256" y="62">Python 24.57%</text>
+  <circle cx="473" cy="57" r="5" fill="#f34b7d" />
+  <text x="486" y="62">C++ 21.9%</text>
+  <circle cx="703" cy="57" r="5" fill="#89e051" />
+  <text x="716" y="62">Shell 11.66%</text>
+  <circle cx="13" cy="97" r="5" fill="#000080" />
+  <text x="26" y="102">Lua 3.87%</text>
+  <circle cx="243" cy="97" r="5" fill="#555555" />
+  <text x="256" y="102">C 2.98%</text>
+  <circle cx="473" cy="97" r="5" fill="#DA3434" />
+  <text x="486" y="102">CMake 2.88%</text>
+  <circle cx="703" cy="97" r="5" fill="#ededed" />
+  <text x="716" y="102">Vim script 1.25%</text>
+</svg>
