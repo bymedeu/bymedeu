@@ -52,8 +52,10 @@ jobs:
 
     steps:
       - name: Generate metrics
-        uses: lowlighter/metrics@latest
+        # Upstream private-clone fix; latest/v3.34 clones without credentials.
+        uses: lowlighter/metrics@995dd4a8e1f60d8f140c214cd197a15b317049ef
         with:
+          use_prebuilt_image: no
           filename: github-metrics.svg
           token: ${{ secrets.METRICS_TOKEN }}
           user: bymedeu
