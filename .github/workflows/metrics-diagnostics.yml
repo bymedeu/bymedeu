@@ -18,7 +18,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
         run: |
-          run_id=$(gh api "repos/$GH_REPO/actions/workflows/metrics.yml/runs?status=completed&per_page=1" --jq '.workflow_runs[0].id')
+          run_id=38784062517
           job_id=$(gh api "repos/$GH_REPO/actions/runs/$run_id/jobs" --jq '.jobs[] | select(.name == "github-metrics") | .id')
           curl --fail --silent --show-error --location --header "Authorization: Bearer $GH_TOKEN" --output "$RUNNER_TEMP/metrics.log" "https://api.github.com/repos/$GH_REPO/actions/jobs/$job_id/logs"
           python3 - <<'PY'
@@ -26,6 +26,16 @@ jobs:
           import re
           from pathlib import Path
           logs = Path(os.environ['RUNNER_TEMP'], 'metrics.log').read_text()
+          lines = logs.splitlines()
+          for index, line in enumerate(lines):
+              if 'extconf failed' not in line:
+                  continue
+              context = '\n'.join(lines[max(0, index - 24):index + 2])
+              context = re.sub(r'https?://[^\s\"\x27)]+', '[URL]', context)
+              for part in range(0, len(context), 2000):
+                  message = context[part:part + 2000].replace('\n', ' | ')
+                  print(f'::notice title=Ruby build context::{message}')
+              break
           errors = []
           for line in logs.splitlines():
               if not re.search(r'E: |npm ERR|ERROR:|error:|Error:|failed:|exit code', line):
