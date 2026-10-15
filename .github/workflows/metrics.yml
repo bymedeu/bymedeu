@@ -10,6 +10,23 @@ on:
   workflow_dispatch:
 
 jobs:
+  verify-stng-access:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Verify METRICS_TOKEN can read STNG and matching commits
+        env:
+          GH_TOKEN: ${{ secrets.METRICS_TOKEN }}
+        run: |
+          gh api repos/Pierre-ESA/SBAS-Teacher-NG --silent
+          matching_commits=$(gh api 'repos/Pierre-ESA/SBAS-Teacher-NG/commits?author=bymedeu&per_page=1' --jq 'length')
+          if [ "$matching_commits" -eq 0 ]; then
+            echo '::error::STNG is accessible, but no commits attributed to bymedeu were found.'
+            exit 1
+          fi
+          echo 'STNG access and at least one commit attributed to bymedeu verified.'
+
   github-metrics:
     runs-on: ubuntu-latest
     permissions:
