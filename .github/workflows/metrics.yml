@@ -55,11 +55,23 @@ jobs:
       contents: write
 
     steps:
+      - name: Supply missing dependency for upstream source build
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          action = Path(os.environ['RUNNER_WORKSPACE']).parent / '_actions/lowlighter/metrics/366f8b9dfe3a59656c67d5dcad9950f59c9bc96d'
+          dockerfile = action / 'Dockerfile'
+          source = dockerfile.read_text()
+          assert 'apt-get install -y curl unzip' in source
+          dockerfile.write_text(source.replace('apt-get install -y curl unzip', 'apt-get install -y curl unzip xz-utils', 1))
+          PY
+
       - name: Generate metrics
         # Upstream private-clone fix; latest/v3.34 clones without credentials.
         uses: lowlighter/metrics@366f8b9dfe3a59656c67d5dcad9950f59c9bc96d
         with:
-          use_prebuilt_image: yes
+          use_prebuilt_image: no
           filename: github-metrics.svg
           token: ${{ secrets.METRICS_TOKEN }}
           user: bymedeu
