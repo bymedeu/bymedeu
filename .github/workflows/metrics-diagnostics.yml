@@ -1,0 +1,39 @@
+name: Metrics diagnostics
+
+on:
+  push:
+    paths:
+      - ".github/workflows/metrics-diagnostics.yml"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Inspect the latest completed metrics failure
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          run_id=$(gh api "repos/$GH_REPO/actions/workflows/metrics.yml/runs?status=completed&per_page=1" --jq '.workflow_runs[0].id')
+          job_id=$(gh api "repos/$GH_REPO/actions/runs/$run_id/jobs" --jq '.jobs[] | select(.name == "github-metrics") | .id')
+          curl --fail --silent --show-error --location --header "Authorization: Bearer $GH_TOKEN" --output "$RUNNER_TEMP/metrics.log" "https://api.github.com/repos/$GH_REPO/actions/jobs/$job_id/logs"
+          python3 - <<'PY'
+          import os
+          import re
+          from pathlib import Path
+          logs = Path(os.environ['RUNNER_TEMP'], 'metrics.log').read_text()
+          errors = []
+          for line in logs.splitlines():
+              if not re.search(r'E: |npm ERR|ERROR:|error:|Error:|failed:|exit code', line):
+                  continue
+              line = re.sub(r'https?://[^\s\"\x27)]+', '[URL]', line)
+              line = re.sub(r'github_pat_[\w]+|gh[pousr]_[\w]+', '[REDACTED]', line)
+              if line not in errors:
+                  errors.append(line)
+          for error in errors[-8:]:
+              print(f'::notice title=Metrics failure detail::{error[:1500]}')
+          PY
