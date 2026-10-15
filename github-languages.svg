@@ -7,29 +7,29 @@
       <rect x="0" y="0" width="920" height="8" fill="white" rx="5" />
     </mask>
     <rect mask="url(#languages-bar)" x="0" y="0" width="0" height="8" fill="#d1d5da" />
-    <rect mask="url(#languages-bar)" x="0" y="0" width="431.32771534837195" height="8" fill="#3572A5" />
-    <rect mask="url(#languages-bar)" x="431.32771534837195" y="0" width="384.48761357366556" height="8" fill="#f34b7d" />
-    <rect mask="url(#languages-bar)" x="815.8153289220376" y="0" width="52.2703618876747" height="8" fill="#555555" />
-    <rect mask="url(#languages-bar)" x="868.0856908097123" y="0" width="50.490098400739896" height="8" fill="#DA3434" />
-    <rect mask="url(#languages-bar)" x="918.5757892104522" y="0" width="1.0261621329819117" height="8" fill="#89e051" />
-    <rect mask="url(#languages-bar)" x="919.601951343434" y="0" width="0.39804865656593724" height="8" fill="#3178c6" />
+    <rect mask="url(#languages-bar)" x="0" y="0" width="594.4775652237954" height="8" fill="#f34b7d" />
+    <rect mask="url(#languages-bar)" x="594.4775652237954" y="0" width="164.43675240427402" height="8" fill="#3572A5" />
+    <rect mask="url(#languages-bar)" x="758.9143176280694" y="0" width="80.81809757025636" height="8" fill="#555555" />
+    <rect mask="url(#languages-bar)" x="839.7324151983258" y="0" width="78.06553372734582" height="8" fill="#DA3434" />
+    <rect mask="url(#languages-bar)" x="917.7979489256716" y="0" width="1.5866060304776635" height="8" fill="#89e051" />
+    <rect mask="url(#languages-bar)" x="919.3845549561493" y="0" width="0.6154450438507663" height="8" fill="#3178c6" />
   </svg>
-  <circle cx="13" cy="57" r="5" fill="#3572A5" />
-  <text x="26" y="62">Python 46.88%</text>
-  <text x="26" y="79">7.31k lines</text>
-  <circle cx="243" cy="57" r="5" fill="#f34b7d" />
-  <text x="256" y="62">C++ 41.79%</text>
-  <text x="256" y="79">6.22k lines</text>
+  <circle cx="13" cy="57" r="5" fill="#f34b7d" />
+  <text x="26" y="62">C++ 64.62%</text>
+  <text x="26" y="79">6.22k lines</text>
+  <circle cx="243" cy="57" r="5" fill="#3572A5" />
+  <text x="256" y="62">Python 17.87%</text>
+  <text x="256" y="79">1.89k lines</text>
   <circle cx="473" cy="57" r="5" fill="#555555" />
-  <text x="486" y="62">C 5.68%</text>
+  <text x="486" y="62">C 8.78%</text>
   <text x="486" y="79">807 lines</text>
   <circle cx="703" cy="57" r="5" fill="#DA3434" />
-  <text x="716" y="62">CMake 5.49%</text>
+  <text x="716" y="62">CMake 8.49%</text>
   <text x="716" y="79">709 lines</text>
   <circle cx="13" cy="97" r="5" fill="#89e051" />
-  <text x="26" y="102">Shell 0.11%</text>
+  <text x="26" y="102">Shell 0.17%</text>
   <text x="26" y="119">16 lines</text>
   <circle cx="243" cy="97" r="5" fill="#3178c6" />
-  <text x="256" y="102">TypeScript 0.04%</text>
+  <text x="256" y="102">TypeScript 0.07%</text>
   <text x="256" y="119">4 lines</text>
 </svg>
