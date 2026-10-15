@@ -53,9 +53,9 @@ jobs:
     steps:
       - name: Generate metrics
         # Upstream private-clone fix; latest/v3.34 clones without credentials.
-        uses: lowlighter/metrics@995dd4a8e1f60d8f140c214cd197a15b317049ef
+        uses: lowlighter/metrics@366f8b9dfe3a59656c67d5dcad9950f59c9bc96d
         with:
-          use_prebuilt_image: no
+          use_prebuilt_image: yes
           filename: github-metrics.svg
           token: ${{ secrets.METRICS_TOKEN }}
           user: bymedeu
@@ -82,6 +82,8 @@ jobs:
             -bymedeu/bymedeu
             -bymedeu/amhe.me
             -bymedeu/epita-ing1
+            # The explicit custom entry below bypasses this filter; count STNG once.
+            -Pierre-ESA/SBAS-Teacher-NG
           commits_authoring: bymedeu, Amadeo Heaulme, Amadéo Heaulme, Medèu, amadeo.heaulme, Amadéo Héaulme
           plugin_repositories: yes
           plugin_repositories_featured: bymedeu/aurora, bymedeu/mystarceiling
@@ -105,6 +107,7 @@ jobs:
           fi
 
   diagnose-language-analysis:
+    needs: github-metrics
     runs-on: ubuntu-latest
     permissions:
       actions: read
@@ -113,8 +116,9 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
+          METRICS_RUN_ID: ${{ github.run_id }}
         run: |
-          previous_run_id=$(gh api "repos/$GH_REPO/actions/workflows/metrics.yml/runs?status=completed&per_page=1" --jq '.workflow_runs[0].id')
+          previous_run_id=$METRICS_RUN_ID
           echo "::notice title=Analysis diagnostic::Inspecting completed run $previous_run_id"
           job_id=$(gh api "repos/$GH_REPO/actions/runs/$previous_run_id/jobs" --jq '.jobs[] | select(.name == "github-metrics") | .id')
           echo "::notice title=Analysis diagnostic::Reading completed metrics job $job_id"
@@ -128,30 +132,12 @@ jobs:
           import re
           from pathlib import Path
           logs = Path(os.environ['RUNNER_TEMP'], 'metrics-analysis.log').read_text()
-          lines = logs.splitlines()
-          for index, line in enumerate(lines):
-              if 'failed to clone https://github.com/Pierre-ESA/SBAS-Teacher-NG' not in line:
-                  continue
-              for context in lines[index:index + 6]:
-                  context = re.sub(r'https?://[^\s\"\x27)]+', '[URL]', context)
-                  context = re.sub(r'github_pat_[\w]+|gh[pousr]_[\w]+', '[REDACTED]', context)
-                  print(f'::notice title=Sanitized STNG clone context::{context[:1500]}')
-          relevant = '\n'.join(line for line in logs.splitlines() if 'SBAS-Teacher-NG' in line or 'SBAS_Teacher_NG' in line)
-          requested = 'cloning https://github.com/Pierre-ESA/SBAS-Teacher-NG' in relevant
-          cloned = 'cloned https://github.com/Pierre-ESA/SBAS-Teacher-NG' in relevant
-          failed = 'failed to clone https://github.com/Pierre-ESA/SBAS-Teacher-NG' in relevant
-          print(f'::notice title=STNG analysis::Clone requested: {requested}; clone succeeded: {cloned}; clone failed: {failed}')
-          matching = re.findall(r'found (\d+) unique commits[^\n]*SBAS.Teacher.NG', relevant)
-          print(f'::notice title=STNG attribution::Matching commit counts in logs: {", ".join(matching) or "not reported"}')
-          for phrase in ['Repository not found', 'Authentication failed', 'maximum execution time', 'indepth analysis processed successfully']:
-              print(f'::notice title=Language analysis diagnostics::{phrase}: {phrase.lower() in logs.lower()}')
-          errors = set()
-          for line in logs.splitlines():
-              if 'failed to clone https://github.com/Pierre-ESA/SBAS-Teacher-NG' in line or 'fatal:' in line:
-                  reason = line.split('fatal:', 1)[-1] if 'fatal:' in line else line.split('failed to clone', 1)[-1]
-                  reason = re.sub(r'https?://[^\s\"\x27)]+', '[URL]', reason)
-                  reason = re.sub(r'github_pat_[\w]+|gh[pousr]_[\w]+', '[REDACTED]', reason)
-                  errors.add(reason.strip())
-          for reason in sorted(errors):
-              print(f'::notice title=Sanitized Git clone error::{reason}')
+          relevant = '\n'.join(line for line in logs.splitlines() if 'sbas-teacher-ng' in line.lower() or 'sbas_teacher_ng' in line.lower())
+          cloned = bool(re.search(r'cloned https://github.com/pierre-esa/sbas-teacher-ng', relevant, re.I))
+          matching = re.findall(r'found (\d+) unique commits[^\n]*SBAS.Teacher.NG', relevant, re.I)
+          print(f'::notice title=STNG analysis::Clone succeeded: {cloned}; matching commit counts: {", ".join(matching) or "not reported"}')
+          timed_out = 'maximum execution time' in logs
+          print(f'::notice title=Language analysis::Analysis timeout: {timed_out}')
+          if not cloned or not any(int(count) > 0 for count in matching):
+              raise SystemExit('STNG was not successfully cloned and attributed by Lowlighter')
           PY
