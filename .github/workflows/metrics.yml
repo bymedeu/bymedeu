@@ -15,6 +15,14 @@ jobs:
     permissions:
       contents: read
     steps:
+      - name: Report accessible private repository count
+        env:
+          GH_TOKEN: ${{ secrets.METRICS_TOKEN }}
+        run: |
+          private_ids=$(gh api 'user/repos?visibility=private&per_page=100' --paginate --jq '.[].id')
+          private_count=$(printf '%s\n' "$private_ids" | sed '/^$/d' | wc -l)
+          echo "::notice title=Metrics token access::Accessible private repositories: $private_count"
+
       - name: Verify METRICS_TOKEN can read STNG and matching commits
         env:
           GH_TOKEN: ${{ secrets.METRICS_TOKEN }}
@@ -75,3 +83,33 @@ jobs:
             git commit -m "chore: update profile language chart [skip ci]"
             git push
           fi
+
+  diagnose-language-analysis:
+    needs: github-metrics
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+    steps:
+      - name: Inspect completed analysis without publishing raw logs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          METRICS_RUN_ID: ${{ github.run_id }}
+        run: |
+          job_id=$(gh api "repos/$GH_REPO/actions/runs/$METRICS_RUN_ID/jobs" --jq '.jobs[] | select(.name == "github-metrics") | .id')
+          gh api "repos/$GH_REPO/actions/jobs/$job_id/logs" > "$RUNNER_TEMP/metrics-analysis.log"
+          python3 - <<'PY'
+          import os
+          import re
+          from pathlib import Path
+          logs = Path(os.environ['RUNNER_TEMP'], 'metrics-analysis.log').read_text()
+          relevant = '\n'.join(line for line in logs.splitlines() if 'SBAS-Teacher-NG' in line)
+          requested = 'cloning https://github.com/Pierre-ESA/SBAS-Teacher-NG' in relevant
+          cloned = 'cloned https://github.com/Pierre-ESA/SBAS-Teacher-NG' in relevant
+          failed = 'failed to clone https://github.com/Pierre-ESA/SBAS-Teacher-NG' in relevant
+          print(f'::notice title=STNG analysis::Clone requested: {requested}; clone succeeded: {cloned}; clone failed: {failed}')
+          matching = re.findall(r'found (\d+) unique commits[^\n]*SBAS.Teacher.NG', relevant)
+          print(f'::notice title=STNG attribution::Matching commit counts in logs: {", ".join(matching) or "not reported"}')
+          for phrase in ['Repository not found', 'Authentication failed', 'maximum execution time', 'indepth analysis processed successfully']:
+              print(f'::notice title=Language analysis diagnostics::{phrase}: {phrase.lower() in logs.lower()}')
+          PY
