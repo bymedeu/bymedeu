@@ -144,4 +144,12 @@ jobs:
                   errors.add(reason.strip())
           for reason in sorted(errors):
               print(f'::notice title=Sanitized Git clone error::{reason}')
+          lines = logs.splitlines()
+          for index, line in enumerate(lines):
+              if 'failed to clone https://github.com/Pierre-ESA/SBAS-Teacher-NG' not in line:
+                  continue
+              for context in lines[index:index + 10]:
+                  context = re.sub(r'https?://[^\s\"\x27)]+', '[URL]', context)
+                  context = re.sub(r'github_pat_[\w]+|gh[pousr]_[\w]+', '[REDACTED]', context)
+                  print(f'::notice title=Sanitized STNG clone context::{context[:1500]}')
           PY
