@@ -73,6 +73,13 @@ jobs:
           plugin_languages_details: lines, percentage
           plugin_languages_limit: 8
           plugin_languages_ignored: html, css, scss, jupyter notebook, Makefile, llvm, M4
+          # Keep language statistics focused on representative engineering work.
+          plugin_languages_skipped: |
+            @use.patterns
+            -bymedeu/config*
+            -bymedeu/bymedeu
+            -bymedeu/amhe.me
+            -bymedeu/epita-ing1
           commits_authoring: bymedeu, Amadeo Heaulme, Amadéo Heaulme, Medèu, amadeo.heaulme, Amadéo Héaulme
           plugin_repositories: yes
           plugin_repositories_featured: bymedeu/aurora, bymedeu/mystarceiling
@@ -96,7 +103,6 @@ jobs:
           fi
 
   diagnose-language-analysis:
-    needs: github-metrics
     runs-on: ubuntu-latest
     permissions:
       actions: read
@@ -105,9 +111,8 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
-          METRICS_RUN_ID: ${{ github.run_id }}
         run: |
-          previous_run_id=$METRICS_RUN_ID
+          previous_run_id=$(gh api "repos/$GH_REPO/actions/workflows/metrics.yml/runs?status=completed&per_page=1" --jq '.workflow_runs[0].id')
           echo "::notice title=Analysis diagnostic::Inspecting completed run $previous_run_id"
           job_id=$(gh api "repos/$GH_REPO/actions/runs/$previous_run_id/jobs" --jq '.jobs[] | select(.name == "github-metrics") | .id')
           echo "::notice title=Analysis diagnostic::Reading completed metrics job $job_id"
@@ -130,4 +135,13 @@ jobs:
           print(f'::notice title=STNG attribution::Matching commit counts in logs: {", ".join(matching) or "not reported"}')
           for phrase in ['Repository not found', 'Authentication failed', 'maximum execution time', 'indepth analysis processed successfully']:
               print(f'::notice title=Language analysis diagnostics::{phrase}: {phrase.lower() in logs.lower()}')
+          errors = set()
+          for line in logs.splitlines():
+              if 'failed to clone https://github.com/Pierre-ESA/SBAS-Teacher-NG' in line or 'fatal:' in line:
+                  reason = line.split('fatal:', 1)[-1] if 'fatal:' in line else line.split('failed to clone', 1)[-1]
+                  reason = re.sub(r'https?://[^\s\"\x27)]+', '[URL]', reason)
+                  reason = re.sub(r'github_pat_[\w]+|gh[pousr]_[\w]+', '[REDACTED]', reason)
+                  errors.add(reason.strip())
+          for reason in sorted(errors):
+              print(f'::notice title=Sanitized Git clone error::{reason}')
           PY
