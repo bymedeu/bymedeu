@@ -85,7 +85,6 @@ jobs:
           fi
 
   diagnose-language-analysis:
-    needs: github-metrics
     runs-on: ubuntu-latest
     permissions:
       actions: read
@@ -94,16 +93,22 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
-          METRICS_RUN_ID: ${{ github.run_id }}
         run: |
-          job_id=$(gh api "repos/$GH_REPO/actions/runs/$METRICS_RUN_ID/jobs" --jq '.jobs[] | select(.name == "github-metrics") | .id')
-          gh api "repos/$GH_REPO/actions/jobs/$job_id/logs" > "$RUNNER_TEMP/metrics-analysis.log"
+          previous_run_id=$(gh api "repos/$GH_REPO/actions/workflows/metrics.yml/runs?status=completed&per_page=1" --jq '.workflow_runs[0].id')
+          echo "::notice title=Analysis diagnostic::Inspecting completed run $previous_run_id"
+          job_id=$(gh api "repos/$GH_REPO/actions/runs/$previous_run_id/jobs" --jq '.jobs[] | select(.name == "github-metrics") | .id')
+          echo "::notice title=Analysis diagnostic::Reading completed metrics job $job_id"
+          log_status=$(curl --silent --show-error --location --header "Authorization: Bearer $GH_TOKEN" --output "$RUNNER_TEMP/metrics-analysis.log" --write-out '%{http_code}' "https://api.github.com/repos/$GH_REPO/actions/jobs/$job_id/logs")
+          if [ "$log_status" != 200 ]; then
+            echo "::error title=Analysis diagnostic::Job log download returned HTTP $log_status"
+            exit 1
+          fi
           python3 - <<'PY'
           import os
           import re
           from pathlib import Path
           logs = Path(os.environ['RUNNER_TEMP'], 'metrics-analysis.log').read_text()
-          relevant = '\n'.join(line for line in logs.splitlines() if 'SBAS-Teacher-NG' in line)
+          relevant = '\n'.join(line for line in logs.splitlines() if 'SBAS-Teacher-NG' in line or 'SBAS_Teacher_NG' in line)
           requested = 'cloning https://github.com/Pierre-ESA/SBAS-Teacher-NG' in relevant
           cloned = 'cloned https://github.com/Pierre-ESA/SBAS-Teacher-NG' in relevant
           failed = 'failed to clone https://github.com/Pierre-ESA/SBAS-Teacher-NG' in relevant
