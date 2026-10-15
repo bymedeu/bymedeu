@@ -126,6 +126,14 @@ jobs:
           import re
           from pathlib import Path
           logs = Path(os.environ['RUNNER_TEMP'], 'metrics-analysis.log').read_text()
+          lines = logs.splitlines()
+          for index, line in enumerate(lines):
+              if 'failed to clone https://github.com/Pierre-ESA/SBAS-Teacher-NG' not in line:
+                  continue
+              for context in lines[index:index + 6]:
+                  context = re.sub(r'https?://[^\s\"\x27)]+', '[URL]', context)
+                  context = re.sub(r'github_pat_[\w]+|gh[pousr]_[\w]+', '[REDACTED]', context)
+                  print(f'::notice title=Sanitized STNG clone context::{context[:1500]}')
           relevant = '\n'.join(line for line in logs.splitlines() if 'SBAS-Teacher-NG' in line or 'SBAS_Teacher_NG' in line)
           requested = 'cloning https://github.com/Pierre-ESA/SBAS-Teacher-NG' in relevant
           cloned = 'cloned https://github.com/Pierre-ESA/SBAS-Teacher-NG' in relevant
@@ -144,12 +152,4 @@ jobs:
                   errors.add(reason.strip())
           for reason in sorted(errors):
               print(f'::notice title=Sanitized Git clone error::{reason}')
-          lines = logs.splitlines()
-          for index, line in enumerate(lines):
-              if 'failed to clone https://github.com/Pierre-ESA/SBAS-Teacher-NG' not in line:
-                  continue
-              for context in lines[index:index + 10]:
-                  context = re.sub(r'https?://[^\s\"\x27)]+', '[URL]', context)
-                  context = re.sub(r'github_pat_[\w]+|gh[pousr]_[\w]+', '[REDACTED]', context)
-                  print(f'::notice title=Sanitized STNG clone context::{context[:1500]}')
           PY
