@@ -9,14 +9,15 @@
   </a>
 </p>
 
-<p align="center">
-  <a href="https://bymedeu.github.io/bymedeu/">
-    <img width="800" src="./github-metrics.svg" alt="Amadéo Héaulme's GitHub activity, languages, and featured projects" />
-  </a>
-</p>
+I'm a computer-engineering student at EPITA, currently a C++ software-engineering intern at ESA. I'm interested in C++, systems, performance, and machine-learning internals.
+
+At ESA, I work on **SBAS Teacher NG**, decoding and interpreting satellite-navigation messages through CLI and Qt interfaces. The project is private.
+
+Personal projects:
+
+- **[Aurora](https://github.com/bymedeu/aurora)** — an early-stage learning project exploring machine learning from first principles. My current focus is M3: a scalar automatic-differentiation engine.
+- **[MyStarCeiling](https://github.com/bymedeu/mystarceiling)** — an early-stage C++ astronomy engine with a working fixed-sky demonstration using real stellar catalogues. Development is currently paused while I focus on Aurora.
 
 <p align="center">
   <img src="https://visitor-badge.laobi.icu/badge?page_id=bymedeu_visitor_badge_simple&left_color=royalblue&right_color=black" alt="Profile views" />
-  <br />
-  <sub>Updated daily.</sub>
 </p>

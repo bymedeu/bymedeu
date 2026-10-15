@@ -26,6 +26,12 @@ jobs:
           base: header, activity, community, repositories, metadata
           config_timezone: Europe/Paris
           plugin_languages: yes
+          # Analyze matching commits across owned and contributed repositories.
+          plugin_languages_indepth: yes
+          plugin_languages_indepth_custom: Pierre-ESA/SBAS-Teacher-NG
+          # Analysis limits are in minutes (global / per repository).
+          plugin_languages_analysis_timeout: 30
+          plugin_languages_analysis_timeout_repositories: 10
           plugin_languages_sections: most-used
           plugin_languages_details: bytes-size, percentage
           plugin_languages_limit: 8
