@@ -35,6 +35,16 @@ jobs:
           fi
           echo 'STNG access and at least one commit attributed to bymedeu verified.'
 
+      - name: Verify Lowlighter Git authentication to STNG
+        env:
+          GH_TOKEN: ${{ secrets.METRICS_TOKEN }}
+        run: |
+          if ! GIT_TERMINAL_PROMPT=0 git ls-remote "https://$GH_TOKEN@github.com/Pierre-ESA/SBAS-Teacher-NG" HEAD > /dev/null 2> "$RUNNER_TEMP/stng-git-access.log"; then
+            echo '::error::STNG API access succeeded, but Lowlighter-style Git authentication failed.'
+            exit 1
+          fi
+          echo '::notice title=STNG Git access::Lowlighter-style Git authentication succeeded.'
+
   github-metrics:
     runs-on: ubuntu-latest
     permissions:
@@ -48,6 +58,7 @@ jobs:
           token: ${{ secrets.METRICS_TOKEN }}
           user: bymedeu
           template: classic
+          debug: yes
           config_display: large
           base: header, activity, community, repositories, metadata
           config_timezone: Europe/Paris
@@ -85,6 +96,7 @@ jobs:
           fi
 
   diagnose-language-analysis:
+    needs: github-metrics
     runs-on: ubuntu-latest
     permissions:
       actions: read
@@ -93,8 +105,9 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
+          METRICS_RUN_ID: ${{ github.run_id }}
         run: |
-          previous_run_id=$(gh api "repos/$GH_REPO/actions/workflows/metrics.yml/runs?status=completed&per_page=1" --jq '.workflow_runs[0].id')
+          previous_run_id=$METRICS_RUN_ID
           echo "::notice title=Analysis diagnostic::Inspecting completed run $previous_run_id"
           job_id=$(gh api "repos/$GH_REPO/actions/runs/$previous_run_id/jobs" --jq '.jobs[] | select(.name == "github-metrics") | .id')
           echo "::notice title=Analysis diagnostic::Reading completed metrics job $job_id"
