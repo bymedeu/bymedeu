@@ -7,29 +7,29 @@
       <rect x="0" y="0" width="920" height="8" fill="white" rx="5" />
     </mask>
     <rect mask="url(#languages-bar)" x="0" y="0" width="0" height="8" fill="#d1d5da" />
-    <rect mask="url(#languages-bar)" x="0" y="0" width="751.8105660722822" height="8" fill="#f34b7d" />
-    <rect mask="url(#languages-bar)" x="751.8105660722822" y="0" width="67.05813142032655" height="8" fill="#555555" />
-    <rect mask="url(#languages-bar)" x="818.8686974926088" y="0" width="29.90640203130777" height="8" fill="#f1e05a" />
-    <rect mask="url(#languages-bar)" x="848.7750995239165" y="0" width="23.08119231149136" height="8" fill="#3572A5" />
-    <rect mask="url(#languages-bar)" x="871.8562918354079" y="0" width="17.786316894062224" height="8" fill="#7355dd" />
-    <rect mask="url(#languages-bar)" x="889.6426087294701" y="0" width="14.895943430285762" height="8" fill="#b07219" />
-    <rect mask="url(#languages-bar)" x="904.5385521597559" y="0" width="9.96946912203162" height="8" fill="#89e051" />
-    <rect mask="url(#languages-bar)" x="914.5080212817876" y="0" width="5.49197871821249" height="8" fill="#DA3434" />
+    <rect mask="url(#languages-bar)" x="0" y="0" width="796.923885037851" height="8" fill="#f34b7d" />
+    <rect mask="url(#languages-bar)" x="796.923885037851" y="0" width="48.208225153692716" height="8" fill="#555555" />
+    <rect mask="url(#languages-bar)" x="845.1321101915438" y="0" width="21.49977239337633" height="8" fill="#f1e05a" />
+    <rect mask="url(#languages-bar)" x="866.63188258492" y="0" width="17.868093559579968" height="8" fill="#3572A5" />
+    <rect mask="url(#languages-bar)" x="884.4999761445" y="0" width="12.78661888309003" height="8" fill="#7355dd" />
+    <rect mask="url(#languages-bar)" x="897.28659502759" y="0" width="10.708723603745012" height="8" fill="#b07219" />
+    <rect mask="url(#languages-bar)" x="907.9953186313351" y="0" width="7.368369701939859" height="8" fill="#89e051" />
+    <rect mask="url(#languages-bar)" x="915.3636883332749" y="0" width="4.636311666725017" height="8" fill="#DA3434" />
   </svg>
   <circle cx="13" cy="57" r="5" fill="#f34b7d" />
-  <text x="26" y="62">C++ 81.72%</text>
+  <text x="26" y="62">C++ 86.62%</text>
   <circle cx="243" cy="57" r="5" fill="#555555" />
-  <text x="256" y="62">C 7.29%</text>
+  <text x="256" y="62">C 5.24%</text>
   <circle cx="473" cy="57" r="5" fill="#f1e05a" />
-  <text x="486" y="62">JavaScript 3.25%</text>
+  <text x="486" y="62">JavaScript 2.34%</text>
   <circle cx="703" cy="57" r="5" fill="#3572A5" />
-  <text x="716" y="62">Python 2.51%</text>
+  <text x="716" y="62">Python 1.94%</text>
   <circle cx="13" cy="81" r="5" fill="#7355dd" />
-  <text x="26" y="86">C# 1.93%</text>
+  <text x="26" y="86">C# 1.39%</text>
   <circle cx="243" cy="81" r="5" fill="#b07219" />
-  <text x="256" y="86">Java 1.62%</text>
+  <text x="256" y="86">Java 1.16%</text>
   <circle cx="473" cy="81" r="5" fill="#89e051" />
-  <text x="486" y="86">Shell 1.08%</text>
+  <text x="486" y="86">Shell 0.8%</text>
   <circle cx="703" cy="81" r="5" fill="#DA3434" />
-  <text x="716" y="86">CMake 0.6%</text>
+  <text x="716" y="86">CMake 0.5%</text>
 </svg>
